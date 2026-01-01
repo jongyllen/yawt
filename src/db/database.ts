@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { Program, ProgramSchema, WorkoutLog, ActiveProgram, ActiveProgramSchema, Workout } from '../schemas/schema';
 
-const DB_NAME = 'yaw2.db';
+const DB_NAME = 'yawt.db';
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
 export const initDatabase = async () => {

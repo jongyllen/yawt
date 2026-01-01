@@ -34,7 +34,7 @@ iOS widgets require a Widget Extension target in Xcode. After running `npx expo 
 
 ### 1. Open in Xcode
 ```bash
-open ios/yaw2.xcworkspace
+open ios/yawt.xcworkspace
 ```
 
 ### 2. Add Widget Extension

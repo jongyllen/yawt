@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "YAWT",
-    "slug": "yaw2",
+    "slug": "yawt",
     "version": "1.0.0",
     "scheme": "yawt",
     "orientation": "portrait",
@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yawt.app"
+      "bundleIdentifier": "com.yawt.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -46,6 +49,12 @@
         }
       ],
       "./plugins/withStreakWidget"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7c088282-1ec2-4b14-bebe-92addc6d864a"
+      }
+    }
   }
 }
