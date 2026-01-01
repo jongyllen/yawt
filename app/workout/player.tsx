@@ -6,6 +6,7 @@ import { Program, Workout } from '../../src/schemas/schema';
 import { getProgramById, initDatabase, saveWorkoutLog, getActiveProgramByProgramId, updateActiveProgram } from '../../src/db/database';
 import { X, Play, Pause, SkipForward, SkipBack, Check } from 'lucide-react-native';
 import { useWorkoutPlayer } from '../../src/hooks/useWorkoutPlayer';
+import * as Feedback from '../../src/utils/feedback';
 
 export default function WorkoutPlayer() {
     const { programId, workoutId, weekNumber, dayNumber } = useLocalSearchParams();
@@ -220,7 +221,10 @@ export default function WorkoutPlayer() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => player.setIsPaused(!player.isPaused)}
+                    onPress={() => {
+                        Feedback.onPauseToggle();
+                        player.setIsPaused(!player.isPaused);
+                    }}
                     style={[styles.playButton, { backgroundColor: player.isPaused ? Colors.primary : Colors.surface }]}
                 >
                     {player.isPaused ? <Play color={Colors.background} size={40} /> : <Pause color={Colors.primary} size={40} />}

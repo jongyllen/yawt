@@ -5,6 +5,7 @@ import { initDatabase, clearAllLogs, clearAllPrograms } from '../../src/db/datab
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from '../../src/utils/notifications';
+import * as Feedback from '../../src/utils/feedback';
 import { Switch, Platform } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
@@ -16,6 +17,10 @@ export default function SettingsScreen() {
     const [userName, setUserName] = React.useState('');
     const [registryRepo, setRegistryRepo] = React.useState('jongyllen/yawt-workouts');
     const [registryBranch, setRegistryBranch] = React.useState('main');
+    
+    // Feedback settings
+    const [hapticsEnabled, setHapticsEnabled] = React.useState(true);
+    const [countdownBeepsEnabled, setCountdownBeepsEnabled] = React.useState(true);
 
     React.useEffect(() => {
         loadSettings();
@@ -38,6 +43,12 @@ export default function SettingsScreen() {
 
         const branch = await AsyncStorage.getItem('registry_branch');
         if (branch) setRegistryBranch(branch);
+        
+        // Load feedback settings
+        await Feedback.loadFeedbackSettings();
+        const feedbackSettings = Feedback.getFeedbackSettings();
+        setHapticsEnabled(feedbackSettings.hapticsEnabled);
+        setCountdownBeepsEnabled(feedbackSettings.countdownBeepsEnabled);
     };
 
     const updateName = async (name: string) => {
@@ -199,6 +210,41 @@ export default function SettingsScreen() {
                     </View>
                 )}
 
+            </View>
+
+            <View style={styles.section}>
+                <Text style={Typography.h3}>Workout Feedback</Text>
+                <View style={[styles.item, styles.rowItem]}>
+                    <View>
+                        <Text style={Typography.body}>Haptic Feedback</Text>
+                        <Text style={Typography.caption}>Vibration on transitions</Text>
+                    </View>
+                    <Switch
+                        value={hapticsEnabled}
+                        onValueChange={async (value) => {
+                            setHapticsEnabled(value);
+                            await Feedback.setFeedbackSetting('haptics', value);
+                            if (value) Feedback.lightTap();
+                        }}
+                        trackColor={{ false: Colors.surface, true: Colors.primary }}
+                        thumbColor={Colors.text}
+                    />
+                </View>
+                <View style={[styles.item, styles.rowItem]}>
+                    <View>
+                        <Text style={Typography.body}>Countdown Alerts</Text>
+                        <Text style={Typography.caption}>Vibrate at 3, 2, 1 seconds</Text>
+                    </View>
+                    <Switch
+                        value={countdownBeepsEnabled}
+                        onValueChange={async (value) => {
+                            setCountdownBeepsEnabled(value);
+                            await Feedback.setFeedbackSetting('countdown', value);
+                        }}
+                        trackColor={{ false: Colors.surface, true: Colors.primary }}
+                        thumbColor={Colors.text}
+                    />
+                </View>
             </View>
 
             <View style={styles.section}>

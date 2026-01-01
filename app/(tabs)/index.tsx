@@ -2,10 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
-import { Play, Check } from 'lucide-react-native';
+import { Play, Check, Flame } from 'lucide-react-native';
 import { initDatabase, getWorkoutLogs, getActivePrograms, getProgramById, getNextWorkoutForProgram } from '../../src/db/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Program, Workout, WorkoutLog } from '../../src/schemas/schema';
+import { calculateStreak, workedOutToday } from '../../src/utils/streak';
+import { saveWidgetData } from '../../src/utils/widgetData';
 
 export default function TodayScreen() {
     const router = useRouter();
@@ -20,12 +22,16 @@ export default function TodayScreen() {
     }[]>([]);
     const [logs, setLogs] = useState<WorkoutLog[]>([]);
     const [userName, setUserName] = useState('');
+    const [streak, setStreak] = useState({ current: 0, longest: 0 });
+    const [completedToday, setCompletedToday] = useState(false);
 
     const loadData = useCallback(async () => {
         const db = await initDatabase();
         const activePrograms = await getActivePrograms(db);
         const workoutLogs = await getWorkoutLogs(db);
         setLogs(workoutLogs);
+        setStreak(calculateStreak(workoutLogs));
+        setCompletedToday(workedOutToday(workoutLogs));
 
         const currentSessions = [];
         for (const ap of activePrograms) {
@@ -41,6 +47,20 @@ export default function TodayScreen() {
 
         const name = await AsyncStorage.getItem('user_name');
         setUserName(name || '');
+
+        // Update widget data
+        const streakData = calculateStreak(workoutLogs);
+        const firstSession = currentSessions[0];
+        saveWidgetData({
+            currentStreak: streakData.current,
+            longestStreak: streakData.longest,
+            nextWorkoutName: firstSession?.nextSession.workout.name || null,
+            nextProgramName: firstSession?.program.name || null,
+            nextWorkoutId: firstSession?.nextSession.workout.id || null,
+            nextProgramId: firstSession?.program.id || null,
+            workedOutToday: workedOutToday(workoutLogs),
+            lastUpdated: new Date().toISOString(),
+        });
     }, []);
 
     useFocusEffect(
@@ -51,7 +71,46 @@ export default function TodayScreen() {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={Typography.h1}>{userName ? `Hello, ${userName}` : 'Today'}</Text>
+            <View style={styles.headerRow}>
+                <Text style={Typography.h1}>{userName ? `Hello, ${userName}` : 'Today'}</Text>
+                <View style={[styles.streakBadge, streak.current > 0 && styles.streakBadgeActive]}>
+                    <Flame
+                        color={streak.current > 0 ? Colors.warning : Colors.textTertiary}
+                        size={20}
+                        fill={streak.current > 0 ? Colors.warning : 'transparent'}
+                    />
+                    <Text style={[styles.streakNumber, streak.current > 0 && styles.streakNumberActive]}>
+                        {streak.current}
+                    </Text>
+                </View>
+            </View>
+
+            {streak.current > 0 && (
+                <View style={styles.streakCard}>
+                    <View style={styles.streakMain}>
+                        <Flame color={Colors.warning} size={32} fill={Colors.warning} />
+                        <View style={styles.streakInfo}>
+                            <Text style={styles.streakLabel}>
+                                {streak.current === 1 ? 'Day streak' : 'Day streak'}
+                            </Text>
+                            <Text style={styles.streakValue}>{streak.current}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.streakMeta}>
+                        {completedToday ? (
+                            <View style={styles.completedBadge}>
+                                <Check color={Colors.success} size={14} />
+                                <Text style={styles.completedText}>Done today</Text>
+                            </View>
+                        ) : (
+                            <Text style={styles.keepGoingText}>Keep it going!</Text>
+                        )}
+                        {streak.longest > streak.current && (
+                            <Text style={styles.bestText}>Best: {streak.longest}</Text>
+                        )}
+                    </View>
+                </View>
+            )}
 
             {activeSessions.length > 0 ? (
                 <View style={styles.section}>
@@ -124,6 +183,91 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.background,
         paddingHorizontal: Spacing.lg,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    streakBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: Spacing.xs,
+        borderRadius: 20,
+        gap: 4,
+        borderWidth: 1,
+        borderColor: Colors.border,
+    },
+    streakBadgeActive: {
+        borderColor: Colors.warning,
+        backgroundColor: `${Colors.warning}15`,
+    },
+    streakNumber: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: Colors.textTertiary,
+    },
+    streakNumberActive: {
+        color: Colors.warning,
+    },
+    streakCard: {
+        marginTop: Spacing.md,
+        backgroundColor: Colors.surface,
+        borderRadius: 16,
+        padding: Spacing.md,
+        borderWidth: 1,
+        borderColor: `${Colors.warning}40`,
+        borderLeftWidth: 4,
+        borderLeftColor: Colors.warning,
+    },
+    streakMain: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.md,
+    },
+    streakInfo: {
+        flex: 1,
+    },
+    streakLabel: {
+        fontSize: 12,
+        color: Colors.textSecondary,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    streakValue: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: Colors.warning,
+    },
+    streakMeta: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: Spacing.sm,
+        paddingTop: Spacing.sm,
+        borderTopWidth: 1,
+        borderTopColor: Colors.border,
+    },
+    completedBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    completedText: {
+        fontSize: 12,
+        color: Colors.success,
+        fontWeight: '600',
+    },
+    keepGoingText: {
+        fontSize: 12,
+        color: Colors.secondary,
+        fontWeight: '600',
+    },
+    bestText: {
+        fontSize: 12,
+        color: Colors.textTertiary,
     },
     section: {
         marginTop: Spacing.xl,

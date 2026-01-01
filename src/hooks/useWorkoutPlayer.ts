@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import * as Haptics from 'expo-haptics';
 import { Workout, Program } from '../schemas/schema';
+import * as Feedback from '../utils/feedback';
 
 interface UseWorkoutPlayerProps {
     workout: Workout | null;
@@ -21,6 +21,17 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
     const [isFinished, setIsFinished] = useState(false);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastCountdownRef = useRef<number | null>(null);
+
+    // Initialize feedback system
+    useEffect(() => {
+        Feedback.initAudio();
+        Feedback.loadFeedbackSettings();
+        
+        return () => {
+            Feedback.cleanupAudio();
+        };
+    }, []);
 
     // Update timeLeft when step/round/block changes
     useEffect(() => {
@@ -28,11 +39,23 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
             const step = workout.blocks[currentBlockIndex]?.steps[currentStepIndex];
             if (step?.durationSeconds) {
                 setTimeLeft(step.durationSeconds);
+                lastCountdownRef.current = null; // Reset countdown tracker
             } else {
                 setTimeLeft(null);
             }
         }
     }, [currentBlockIndex, currentStepIndex, currentRound, workout]);
+
+    // Countdown feedback effect
+    useEffect(() => {
+        if (timeLeft !== null && timeLeft <= 3 && timeLeft > 0 && !isPaused) {
+            // Only trigger if we haven't already for this second
+            if (lastCountdownRef.current !== timeLeft) {
+                lastCountdownRef.current = timeLeft;
+                Feedback.onCountdown(timeLeft);
+            }
+        }
+    }, [timeLeft, isPaused]);
 
     // Timer logic
     useEffect(() => {
@@ -40,6 +63,7 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev === 1) {
+                        Feedback.onCountdown(0); // Final beep
                         handleNext();
                         return 0;
                     }
@@ -55,20 +79,27 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
     }, [timeLeft, isPaused, isFinished]);
 
     const handleNext = useCallback(async () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         if (!workout) return;
 
         const currentBlock = workout.blocks[currentBlockIndex];
         if (currentStepIndex < currentBlock.steps.length - 1) {
+            // Moving to next step in same round
+            Feedback.onStepTransition();
             setCurrentStepIndex(prev => prev + 1);
         } else if (currentRound < currentBlock.rounds) {
+            // Moving to next round
+            Feedback.onStepTransition();
             setCurrentRound(prev => prev + 1);
             setCurrentStepIndex(0);
         } else if (currentBlockIndex < workout.blocks.length - 1) {
+            // Moving to next block
+            Feedback.onBlockComplete();
             setCurrentBlockIndex(prev => prev + 1);
             setCurrentStepIndex(0);
             setCurrentRound(1);
         } else {
+            // Workout complete!
+            Feedback.onWorkoutComplete();
             setIsFinished(true);
             setIsPaused(true);
             onFinish();
@@ -76,6 +107,7 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
     }, [workout, currentBlockIndex, currentStepIndex, currentRound, onFinish]);
 
     const handleBack = useCallback(() => {
+        Feedback.onGoBack();
         if (currentStepIndex > 0) {
             setCurrentStepIndex(prev => prev - 1);
         } else if (currentRound > 1) {

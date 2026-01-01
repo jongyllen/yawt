@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Colors } from '../../src/constants/theme';
-import { Home, List, Settings as SettingsIcon } from 'lucide-react-native';
+import { Home, List, Settings as SettingsIcon, BarChart3 } from 'lucide-react-native';
 
 export default function TabLayout() {
     return (
@@ -34,6 +34,13 @@ export default function TabLayout() {
                 options={{
                     title: 'Programs',
                     tabBarIcon: ({ color, size }) => <List color={color} size={size} />,
+                }}
+            />
+            <Tabs.Screen
+                name="stats"
+                options={{
+                    title: 'Stats',
+                    tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
                 }}
             />
             <Tabs.Screen
