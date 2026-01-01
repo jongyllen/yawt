@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import SharedGroupPreferences from 'react-native-shared-group-preferences';
+import WidgetCenter from 'react-native-widget-center';
 
 // Keys for widget data storage
 const WIDGET_DATA_KEY = 'widget_data';
@@ -21,7 +23,7 @@ export interface WidgetData {
 export async function saveWidgetData(data: WidgetData): Promise<void> {
     try {
         await AsyncStorage.setItem(WIDGET_DATA_KEY, JSON.stringify(data));
-        
+
         // Trigger widget update on Android
         if (Platform.OS === 'android') {
             try {
@@ -29,10 +31,25 @@ export async function saveWidgetData(data: WidgetData): Promise<void> {
                 await requestWidgetUpdate({
                     widgetName: 'StreakWidget',
                     renderWidget: () => null, // Will be handled by native code
-                    widgetNotFound: () => {},
+                    widgetNotFound: () => { },
                 });
             } catch (e) {
                 // Widget package might not be available
+            }
+        }
+
+        // Save to Shared App Group on iOS
+        if (Platform.OS === 'ios' && SharedGroupPreferences) {
+            try {
+                const APP_GROUP = 'group.com.yawt.app';
+                // Save the entire object as a string for reliability
+                await SharedGroupPreferences.setItem('widgetData', JSON.stringify(data), APP_GROUP);
+
+                // Force an immediate reload of the iOS widget
+                WidgetCenter.reloadAllTimelines();
+                console.log('Successfully saved and reloaded iOS widget data');
+            } catch (e) {
+                console.error('Error saving to iOS App Group:', e);
             }
         }
     } catch (e) {

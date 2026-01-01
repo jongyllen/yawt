@@ -32,28 +32,29 @@ export function calculateStreak(logs: WorkoutLog[]): { current: number; longest:
     // Check if streak is active (worked out today or yesterday)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
     const mostRecent = sortedDates[0];
     mostRecent.setHours(0, 0, 0, 0);
 
-    const isStreakActive = mostRecent.getTime() === today.getTime() || 
-                           mostRecent.getTime() === yesterday.getTime();
+    const isStreakActive = mostRecent.getTime() === today.getTime() ||
+        mostRecent.getTime() === yesterday.getTime();
 
     // Calculate current streak
     let currentStreak = 0;
     if (isStreakActive) {
         currentStreak = 1;
-        let checkDate = new Date(mostRecent);
-        
-        for (let i = 1; i < sortedDates.length; i++) {
-            checkDate.setDate(checkDate.getDate() - 1);
-            const nextDate = sortedDates[i];
-            nextDate.setHours(0, 0, 0, 0);
-            
-            if (nextDate.getTime() === checkDate.getTime()) {
+
+        for (let i = 0; i < sortedDates.length - 1; i++) {
+            const current = sortedDates[i];
+            const next = sortedDates[i + 1];
+
+            // Allow 1 day gap (diffDays = 1 or 2)
+            const diffDays = Math.round((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 2) {
                 currentStreak++;
             } else {
                 break;
@@ -64,13 +65,13 @@ export function calculateStreak(logs: WorkoutLog[]): { current: number; longest:
     // Calculate longest streak
     let longestStreak = 0;
     let tempStreak = 1;
-    
+
     for (let i = 0; i < sortedDates.length - 1; i++) {
         const current = sortedDates[i];
         const next = sortedDates[i + 1];
-        
+
         const diffDays = Math.round((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 1) {
             tempStreak++;
         } else {
@@ -80,9 +81,9 @@ export function calculateStreak(logs: WorkoutLog[]): { current: number; longest:
     }
     longestStreak = Math.max(longestStreak, tempStreak);
 
-    return { 
-        current: currentStreak, 
-        longest: Math.max(longestStreak, currentStreak) 
+    return {
+        current: currentStreak,
+        longest: Math.max(longestStreak, currentStreak)
     };
 }
 
@@ -92,7 +93,7 @@ export function calculateStreak(logs: WorkoutLog[]): { current: number; longest:
 export function workedOutToday(logs: WorkoutLog[]): boolean {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     return logs.some(log => {
         const logDate = new Date(log.date);
         logDate.setHours(0, 0, 0, 0);
