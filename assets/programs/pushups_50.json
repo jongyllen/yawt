@@ -1,0 +1,505 @@
+{
+    "id": "50-pushups-challenge",
+    "version": "workout.program.v1",
+    "name": "50 Pushups Challenge",
+    "description": "A 6-week progressive plan to take you to 50 consecutive pushups.",
+    "weeks": [
+        {
+            "weekNumber": 1,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w1-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w1-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-w1-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 2,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w2-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w2-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-w2-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 3,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w3-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w3-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-w3-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 4,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w4-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w4-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-w4-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 5,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w5-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w5-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-w5-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 6,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "pushups-w6-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "pushups-w6-d2"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "pushups-final"
+                }
+            ]
+        }
+    ],
+    "workouts": [
+        {
+            "id": "pushups-w1-d1",
+            "name": "Week 1 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 10,
+                            "cues": [
+                                "Full lockout",
+                                "Core tight"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w1-d2",
+            "name": "Week 1 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 12,
+                            "cues": [
+                                "Touch chest",
+                                "Elbows in"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w1-d3",
+            "name": "Week 1 Day 3",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 10,
+                            "cues": [
+                                "Breathe out on push"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w2-d1",
+            "name": "Week 2 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 12
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w2-d2",
+            "name": "Week 2 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 14
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w2-d3",
+            "name": "Week 2 Day 3",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 5,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 12
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w3-d1",
+            "name": "Week 3 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 90,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 20
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w3-d2",
+            "name": "Week 3 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 18
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w3-d3",
+            "name": "Week 3 Day 3",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 5,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 15
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w4-d1",
+            "name": "Week 4 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 90,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 25
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w4-d2",
+            "name": "Week 4 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 20
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w4-d3",
+            "name": "Week 4 Day 3",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 5,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 18
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w5-d1",
+            "name": "Week 5 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 120,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 30
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w5-d2",
+            "name": "Week 5 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 4,
+                    "restBetweenRounds": 90,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 25
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w5-d3",
+            "name": "Week 5 Day 3",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 5,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 20
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w6-d1",
+            "name": "Week 6 Day 1",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 2,
+                    "restBetweenRounds": 120,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 35
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-w6-d2",
+            "name": "Week 6 Day 2",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 2,
+                    "restBetweenRounds": 120,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 40
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "pushups-final",
+            "name": "THE FINAL TEST",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Set",
+                    "type": "main",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "exercise_inline",
+                            "name": "Pushups",
+                            "reps": 50,
+                            "instructions": "This is it. Give it everything you've got. 50 in a row.",
+                            "cues": [
+                                "DON'T QUIT",
+                                "CHAMPION MENTALITY"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

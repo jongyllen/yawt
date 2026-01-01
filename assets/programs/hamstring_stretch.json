@@ -1,0 +1,333 @@
+{
+    "id": "hamstring-strength-flex",
+    "version": "workout.program.v1",
+    "name": "Hamstring Flexibility",
+    "description": "A 2-week daily routine to fix tight hamstrings and improve lower body mobility.",
+    "weeks": [
+        {
+            "weekNumber": 1,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "ham-w1-d1"
+                },
+                {
+                    "dayNumber": 2,
+                    "workoutId": "ham-w1-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "ham-w1-d2"
+                },
+                {
+                    "dayNumber": 4,
+                    "workoutId": "ham-w1-d1"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "ham-w1-d2"
+                },
+                {
+                    "dayNumber": 6,
+                    "workoutId": "ham-w1-d3"
+                },
+                {
+                    "dayNumber": 7,
+                    "workoutId": "ham-w1-d3"
+                }
+            ]
+        },
+        {
+            "weekNumber": 2,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "ham-w2-d1"
+                },
+                {
+                    "dayNumber": 2,
+                    "workoutId": "ham-w2-d1"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "ham-w2-d2"
+                },
+                {
+                    "dayNumber": 4,
+                    "workoutId": "ham-w2-d1"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "ham-w2-d2"
+                },
+                {
+                    "dayNumber": 6,
+                    "workoutId": "ham-w2-d3"
+                },
+                {
+                    "dayNumber": 7,
+                    "workoutId": "ham-w2-d3"
+                }
+            ]
+        }
+    ],
+    "workouts": [
+        {
+            "id": "ham-w1-d1",
+            "name": "Foundational Lengthening",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Active Warmup",
+                    "type": "warmup",
+                    "rounds": 2,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "timer",
+                            "name": "Leg Swings (L)",
+                            "durationSeconds": 30,
+                            "instructions": "Hold onto a wall for balance and swing your left leg forward and back.",
+                            "cues": [
+                                "Stay upright",
+                                "Swing from the hip"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "timer",
+                            "name": "Leg Swings (R)",
+                            "durationSeconds": 30,
+                            "instructions": "Hold onto a wall for balance and swing your right leg forward and back.",
+                            "cues": [
+                                "Stay upright",
+                                "Swing from the hip"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "b2",
+                    "name": "Static Holds",
+                    "type": "main",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Standing Forward Fold",
+                            "durationSeconds": 60,
+                            "instructions": "Hinge at the hips and let your upper body hang. Don't worry if you can't touch your toes.",
+                            "cues": [
+                                "Micro-bend in knees",
+                                "Relax your neck"
+                            ]
+                        },
+                        {
+                            "id": "s4",
+                            "type": "rest",
+                            "durationSeconds": 15
+                        },
+                        {
+                            "id": "s5",
+                            "type": "hold",
+                            "name": "Seated Pike Stretch",
+                            "durationSeconds": 60,
+                            "instructions": "Sit with legs straight and reach forward. Focus on keeping your back flat.",
+                            "cues": [
+                                "Lead with chest",
+                                "Flex your toes"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ham-w1-d2",
+            "name": "Unilateral Focus",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Main Holds",
+                    "type": "main",
+                    "rounds": 2,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Single Leg Fold (L)",
+                            "durationSeconds": 45,
+                            "instructions": "One leg extended, the other tucked in. Hinge towards the extended foot.",
+                            "cues": [
+                                "Square hips",
+                                "Deep breaths"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Single Leg Fold (R)",
+                            "durationSeconds": 45,
+                            "instructions": "One leg extended, the other tucked in. Hinge towards the extended foot.",
+                            "cues": [
+                                "Square hips",
+                                "Deep breaths"
+                            ]
+                        },
+                        {
+                            "id": "s3",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ham-w1-d3",
+            "name": "Active Recovery",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Flow",
+                    "type": "main",
+                    "rounds": 3,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Downward Dog",
+                            "durationSeconds": 45,
+                            "instructions": "Push your hips up and back. Focus on pushing your heels into the ground.",
+                            "cues": [
+                                "Spread fingers",
+                                "Tailbone to sky"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "timer",
+                            "name": "Pedal Feet",
+                            "durationSeconds": 30,
+                            "instructions": "Walk the dog by alternating bending each knee in Downward Dog.",
+                            "cues": [
+                                "Dynamic movement"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ham-w2-d1",
+            "name": "Deep Lengthening",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Deep Holds",
+                    "type": "main",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Standing Forward Fold",
+                            "durationSeconds": 90,
+                            "instructions": "Deepen the fold. Aim for a flat back if possible.",
+                            "cues": [
+                                "Weight on front of feet"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        },
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Seated Pike",
+                            "durationSeconds": 90,
+                            "instructions": "Reach further than last week.",
+                            "cues": [
+                                "Knees locked if comfortable"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ham-w2-d2",
+            "name": "Positional Stretch",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Lateral Focus",
+                    "type": "main",
+                    "rounds": 2,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Lying Leg Stretch (L)",
+                            "durationSeconds": 60,
+                            "instructions": "Lie on your back and pull your left leg towards you using a towel or hands.",
+                            "cues": [
+                                "Keep right leg on floor",
+                                "Relax shoulders"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Lying Leg Stretch (R)",
+                            "durationSeconds": 60,
+                            "instructions": "Lie on your back and pull your right leg towards you.",
+                            "cues": [
+                                "Keep left leg on floor",
+                                "Relax shoulders"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ham-w2-d3",
+            "name": "Final Mobility Flow",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "End of Program Flow",
+                    "type": "main",
+                    "rounds": 2,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Downward Dog",
+                            "durationSeconds": 60,
+                            "instructions": "Test your mobility. How close are your heels to the floor?",
+                            "cues": [
+                                "Hollow your belly"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Deep Squat Hold",
+                            "durationSeconds": 60,
+                            "instructions": "Sit deep into a squat, keeping your heels on the ground.",
+                            "cues": [
+                                "Push knees out",
+                                "Tall spine"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,254 @@
+{
+    "id": "yoga-mobility-refined",
+    "version": "workout.program.v1",
+    "name": "Yoga & Mobility",
+    "description": "Unlock your body with these daily mobility flows.",
+    "weeks": [
+        {
+            "weekNumber": 1,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "yoga-morning-A"
+                },
+                {
+                    "dayNumber": 2,
+                    "workoutId": "yoga-evening-A"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "yoga-morning-A"
+                },
+                {
+                    "dayNumber": 4,
+                    "workoutId": "yoga-evening-A"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "yoga-morning-B"
+                },
+                {
+                    "dayNumber": 6,
+                    "workoutId": "yoga-evening-B"
+                },
+                {
+                    "dayNumber": 7,
+                    "workoutId": "yoga-morning-B"
+                }
+            ]
+        }
+    ],
+    "workouts": [
+        {
+            "id": "yoga-morning-A",
+            "name": "Sunrise Mobility",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Sun Salutation Alpha",
+                    "type": "main",
+                    "rounds": 3,
+                    "restBetweenRounds": 30,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Mountain Pose",
+                            "durationSeconds": 20,
+                            "instructions": "Stand tall with arms at your sides. Feel grounded through all four corners of your feet.",
+                            "cues": [
+                                "Engage thighs",
+                                "Lift crown of head"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Downward Dog",
+                            "durationSeconds": 40,
+                            "instructions": "Standard downward dog. Focus on the stretch in your entire back side.",
+                            "cues": [
+                                "Push through palms",
+                                "Roll shoulders out"
+                            ]
+                        },
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Cobra Pose",
+                            "durationSeconds": 30,
+                            "instructions": "Lower your hips, lift your chest. Keep your elbows slightly bent and close to your ribs.",
+                            "cues": [
+                                "Look forward",
+                                "Relax your glutes"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "yoga-evening-A",
+            "name": "Sweet Dreams Flow",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Restorative",
+                    "type": "main",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Cat-Cow",
+                            "durationSeconds": 60,
+                            "instructions": "Alternate between arching and rounding your back on all fours.",
+                            "cues": [
+                                "Breathe with movement",
+                                "Inhale Cow, Exhale Cat"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Child's Pose",
+                            "durationSeconds": 90,
+                            "instructions": "Sink your hips back to your heels and rest your forehead on the mat.",
+                            "cues": [
+                                "Deep belly breaths",
+                                "Let go of tension"
+                            ]
+                        },
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Pigeon Pose (L)",
+                            "durationSeconds": 45,
+                            "instructions": "Lower your left shin to the floor, extending your right leg back.",
+                            "cues": [
+                                "Square your hips",
+                                "Stay upright or fold"
+                            ]
+                        },
+                        {
+                            "id": "s4",
+                            "type": "hold",
+                            "name": "Pigeon Pose (R)",
+                            "durationSeconds": 45,
+                            "instructions": "Lower your right shin to the floor, extending your left leg back.",
+                            "cues": [
+                                "Square your hips",
+                                "Stay upright or fold"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "yoga-morning-B",
+            "name": "Flow & Foundation",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Balance & Reach",
+                    "type": "main",
+                    "rounds": 2,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Warrior I (L)",
+                            "durationSeconds": 30,
+                            "instructions": "Step back with right foot, bend left knee. Arms up.",
+                            "cues": [
+                                "Hips point forward",
+                                "Back heel down"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Warrior I (R)",
+                            "durationSeconds": 30,
+                            "instructions": "Step back with left foot, bend right knee. Arms up.",
+                            "cues": [
+                                "Hips point forward",
+                                "Back heel down"
+                            ]
+                        },
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Triangle Pose (L)",
+                            "durationSeconds": 30,
+                            "instructions": "Extend left arm down, right arm up. Legs straight but not locked.",
+                            "cues": [
+                                "Open your chest",
+                                "Reach for the stars"
+                            ]
+                        },
+                        {
+                            "id": "s4",
+                            "type": "hold",
+                            "name": "Triangle Pose (R)",
+                            "durationSeconds": 30,
+                            "instructions": "Extend right arm down, left arm up.",
+                            "cues": [
+                                "Open your chest",
+                                "Reach for the stars"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "yoga-evening-B",
+            "name": "Spinal Health",
+            "blocks": [
+                {
+                    "id": "b1",
+                    "name": "Twists & Release",
+                    "type": "main",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "s1",
+                            "type": "hold",
+                            "name": "Supine Twist (L)",
+                            "durationSeconds": 60,
+                            "instructions": "Lie on back, bring left knee across body to the right. Look left.",
+                            "cues": [
+                                "Shoulders on floor",
+                                "Breath into sides"
+                            ]
+                        },
+                        {
+                            "id": "s2",
+                            "type": "hold",
+                            "name": "Supine Twist (R)",
+                            "durationSeconds": 60,
+                            "instructions": "Lie on back, bring right knee across body to the left. Look right.",
+                            "cues": [
+                                "Shoulders on floor",
+                                "Breath into sides"
+                            ]
+                        },
+                        {
+                            "id": "s3",
+                            "type": "hold",
+                            "name": "Happy Baby",
+                            "durationSeconds": 60,
+                            "instructions": "Grab your feet and rock gently side to side.",
+                            "cues": [
+                                "Massage lower back",
+                                "Smile!"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

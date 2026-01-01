@@ -1,0 +1,554 @@
+{
+    "id": "calisthenics-28",
+    "version": "workout.program.v1",
+    "name": "28-Day Calisthenics Plan",
+    "description": "BetterMe-style low-impact plan for foundation and form.",
+    "weeks": [
+        {
+            "weekNumber": 1,
+            "workouts": [
+                {
+                    "dayNumber": 1,
+                    "workoutId": "cali-w1-d1"
+                },
+                {
+                    "dayNumber": 2,
+                    "workoutId": "cali-w1-d2"
+                },
+                {
+                    "dayNumber": 3,
+                    "workoutId": "cali-w1-d3"
+                },
+                {
+                    "dayNumber": 4,
+                    "workoutId": "cali-w1-d4"
+                },
+                {
+                    "dayNumber": 5,
+                    "workoutId": "cali-w1-d5"
+                }
+            ]
+        }
+    ],
+    "workouts": [
+        {
+            "id": "cali-w1-d1",
+            "name": "Full Body Burn",
+            "blocks": [
+                {
+                    "id": "warmup",
+                    "name": "Warm-up",
+                    "type": "warmup",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "w1",
+                            "type": "timer",
+                            "name": "Light Jog in Place",
+                            "description": "Get your blood moving",
+                            "instructions": "March or jog in a comfortable rhythm. Keep your back straight and look forward. Pump your arms gently to engage your whole body.",
+                            "cues": [
+                                "Relaxed shoulders",
+                                "Consistent breathing"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                },
+                {
+                    "id": "circuit",
+                    "name": "Main Circuit",
+                    "type": "circuit",
+                    "rounds": 3,
+                    "restBetweenRounds": 60,
+                    "steps": [
+                        {
+                            "id": "c1",
+                            "type": "exercise_inline",
+                            "name": "Incline Push-ups",
+                            "description": "Chest and Triceps focus",
+                            "instructions": "Place your hands on a stable elevated surface (bench or chair). Keep your body in a straight line. Lower your chest until it nearly touches the surface, then push back up. Focus on a controlled tempo.",
+                            "cues": [
+                                "Elbows at 45°",
+                                "Core tight",
+                                "No sagging hips"
+                            ],
+                            "durationSeconds": 40
+                        },
+                        {
+                            "id": "r1",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        },
+                        {
+                            "id": "c2",
+                            "type": "exercise_inline",
+                            "name": "Bodyweight Squats",
+                            "description": "Legs and Glutes",
+                            "instructions": "Feet shoulder-width apart. Sit back as if into a chair. Keep your chest up and weight on your heels. Drive through your mid-foot to stand back up.",
+                            "cues": [
+                                "Chest up",
+                                "Knees path over toes",
+                                "Drive through heels"
+                            ],
+                            "durationSeconds": 40
+                        },
+                        {
+                            "id": "r2",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        },
+                        {
+                            "id": "c3",
+                            "type": "exercise_inline",
+                            "name": "Dead Bug",
+                            "description": "Deep Core Stability",
+                            "instructions": "Lie on your back with arms up and knees bent at 90°. Slowly lower opposite arm and leg while keeping your lower back pressed firmly into the floor. Return and repeat on the other side.",
+                            "cues": [
+                                "Low back on floor",
+                                "Slow, controlled movements"
+                            ],
+                            "durationSeconds": 40
+                        },
+                        {
+                            "id": "r3",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        },
+                        {
+                            "id": "c4",
+                            "type": "exercise_inline",
+                            "name": "Glute Bridges",
+                            "description": "Posterior Chain",
+                            "instructions": "Lie on your back with knees bent and feet flat. Squeeze your glutes to lift your hips until they align with your shoulders and knees. Pause, then lower back down.",
+                            "cues": [
+                                "Squeeze glutes at top",
+                                "Keep ribcage down"
+                            ],
+                            "durationSeconds": 40
+                        },
+                        {
+                            "id": "r4",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        },
+                        {
+                            "id": "c5",
+                            "type": "exercise_inline",
+                            "name": "Standing Mountain Climbers",
+                            "description": "Low-impact Cardio",
+                            "instructions": "Stand tall and march in place, bringing your knees up high while reaching your opposite arm towards the ceiling in a climbing motion.",
+                            "cues": [
+                                "Knees high",
+                                "Engage core",
+                                "Reach high"
+                            ],
+                            "durationSeconds": 40
+                        },
+                        {
+                            "id": "r5",
+                            "type": "rest",
+                            "durationSeconds": 20
+                        }
+                    ]
+                },
+                {
+                    "id": "cooldown",
+                    "name": "Cooldown",
+                    "type": "cooldown",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "cd1",
+                            "type": "hold",
+                            "name": "Static Stretching",
+                            "description": "Recovery and relaxation",
+                            "instructions": "Perform gentle stretches for the chest, quads, and hamstrings. Hold each position without bouncing. Breathe deeply to lower your heart rate.",
+                            "cues": [
+                                "Breathe deep",
+                                "Don't force the stretch"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "cali-w1-d2",
+            "name": "Core & Stability",
+            "blocks": [
+                {
+                    "id": "warmup",
+                    "name": "Warm-up",
+                    "type": "warmup",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "w1",
+                            "type": "timer",
+                            "name": "Neck and Shoulder Rolls",
+                            "description": "Loosen up",
+                            "instructions": "Slowly rotate your neck in circles, then transition to large shoulder rolls. Helps release tension from daily sitting.",
+                            "cues": [
+                                "Slow and gentle",
+                                "Full range of motion"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                },
+                {
+                    "id": "circuit",
+                    "name": "Main Circuit",
+                    "type": "circuit",
+                    "rounds": 3,
+                    "steps": [
+                        {
+                            "id": "c1",
+                            "type": "hold",
+                            "name": "Forearm Plank",
+                            "description": "Full Body Tension",
+                            "instructions": "Hold a straight line from head to heels while resting on your forearms. Engage your core, glutes, and quads to maintain stability.",
+                            "cues": [
+                                "Don't let hips sag",
+                                "Press floor away with elbows",
+                                "Neutral neck"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c2",
+                            "type": "hold",
+                            "name": "Side Plank (L)",
+                            "description": "Lateral Chain",
+                            "instructions": "Lie on your left side and prop yourself up on your left forearm. Stack your feet and lift your hips high until your body forms a straight line.",
+                            "cues": [
+                                "Hip high",
+                                "Shoulder vertical",
+                                "Don't rotate forward"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c3",
+                            "type": "hold",
+                            "name": "Side Plank (R)",
+                            "description": "Lateral Chain",
+                            "instructions": "Lie on your right side and prop yourself up on your right forearm. Stack your feet and lift your hips high until your body forms a straight line.",
+                            "cues": [
+                                "Hip high",
+                                "Shoulder vertical",
+                                "Don't rotate forward"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c4",
+                            "type": "hold",
+                            "name": "Bird Dog",
+                            "description": "Diagonal Stability",
+                            "instructions": "From all fours, extend your opposite arm and leg simultaneously. Maintain a flat back and level hips. Stretch as if being pulled from both ends.",
+                            "cues": [
+                                "Flat back",
+                                "Reach through heel",
+                                "Don't arch lower back"
+                            ],
+                            "reps": 10
+                        }
+                    ]
+                },
+                {
+                    "id": "cooldown",
+                    "name": "Cooldown",
+                    "type": "cooldown",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "cd1",
+                            "type": "hold",
+                            "name": "Child's Pose",
+                            "description": "Back release",
+                            "instructions": "Kneel on the floor, sit on your heels, and fold forward, stretching your arms out in front of you. Breathe into your lower back.",
+                            "cues": [
+                                "Relax forehead to floor",
+                                "Deep belly breaths"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "cali-w1-d3",
+            "name": "Upper Body Focus",
+            "blocks": [
+                {
+                    "id": "warmup",
+                    "name": "Warm-up",
+                    "type": "warmup",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "w1",
+                            "type": "timer",
+                            "name": "Arm Circles",
+                            "description": "Shoulder mobility",
+                            "instructions": "Extend arms to the sides and perform small, then large circles. Reverse direction halfway through.",
+                            "cues": [
+                                "Keep arms straight",
+                                "Wide circles"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                },
+                {
+                    "id": "circuit",
+                    "name": "Main Circuit",
+                    "type": "circuit",
+                    "rounds": 3,
+                    "steps": [
+                        {
+                            "id": "c1",
+                            "type": "exercise_inline",
+                            "name": "Push-ups",
+                            "description": "Foundational strength",
+                            "instructions": "Place your hands slightly wider than shoulder-width. Lower your chest until it nearly touches the floor, then push back up. Keep your body straight.",
+                            "cues": [
+                                "No sagging back",
+                                "Full range of motion"
+                            ],
+                            "reps": 10
+                        },
+                        {
+                            "id": "c2",
+                            "type": "exercise_inline",
+                            "name": "Pike Hold",
+                            "description": "Shoulder stability",
+                            "instructions": "From a pushup position, walk your feet in and lift your hips high, forming an inverted V. Hold your weight on your shoulders.",
+                            "cues": [
+                                "Hips high",
+                                "Look at your feet"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c3",
+                            "type": "exercise_inline",
+                            "name": "Triceps Dips",
+                            "description": "Arm definition",
+                            "instructions": "Sit on the edge of a chair or bench, hands next to hips. Slide off and lower your body by bending your elbows, then push back up.",
+                            "cues": [
+                                "Elbows back",
+                                "Chest up"
+                            ],
+                            "reps": 12
+                        }
+                    ]
+                },
+                {
+                    "id": "cooldown",
+                    "name": "Cooldown",
+                    "type": "cooldown",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "cd1",
+                            "type": "hold",
+                            "name": "Arm Stretch",
+                            "description": "Triceps and chest",
+                            "instructions": "Stretch each arm across your body and also reach overhead to touch the opposite shoulder blade.",
+                            "cues": [
+                                "Gentle pulling",
+                                "Breathe into it"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "cali-w1-d4",
+            "name": "Low-Impact Legs",
+            "blocks": [
+                {
+                    "id": "warmup",
+                    "name": "Warm-up",
+                    "type": "warmup",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "w1",
+                            "type": "timer",
+                            "name": "Leg Swings",
+                            "description": "Hip mobility",
+                            "instructions": "Hold onto a wall and swing one leg forward and backward, then side-to-side. Switch legs halfway.",
+                            "cues": [
+                                "Keep torso still",
+                                "Broad swings"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                },
+                {
+                    "id": "circuit",
+                    "name": "Main Circuit",
+                    "type": "circuit",
+                    "rounds": 3,
+                    "steps": [
+                        {
+                            "id": "c1",
+                            "type": "exercise_inline",
+                            "name": "Sit-to-stand squats",
+                            "description": "Controlled quad work",
+                            "instructions": "Stand in front of a chair. Sit down slowly until your glutes touch the seat, then immediately stand back up.",
+                            "cues": [
+                                "Controlled descent",
+                                "Don't 'plop' down"
+                            ],
+                            "reps": 15
+                        },
+                        {
+                            "id": "c2",
+                            "type": "exercise_inline",
+                            "name": "Reverse lunges",
+                            "description": "Unilateral leg strength",
+                            "instructions": "Step backward and lower your rear knee toward the floor. Keep your front shin vertical. Step back to start and switch legs.",
+                            "cues": [
+                                "Stay upright",
+                                "90-90 knee angles"
+                            ],
+                            "reps": 20
+                        },
+                        {
+                            "id": "c3",
+                            "type": "exercise_inline",
+                            "name": "Calf raises",
+                            "description": "Lower leg endurance",
+                            "instructions": "Stand on the edge of a step. Rise onto your toes, pause, and lower your heels slightly below the step level.",
+                            "cues": [
+                                "Full vertical reach",
+                                "Pause at top"
+                            ],
+                            "reps": 20
+                        }
+                    ]
+                },
+                {
+                    "id": "cooldown",
+                    "name": "Cooldown",
+                    "type": "cooldown",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "cd1",
+                            "type": "hold",
+                            "name": "Quad Stretch",
+                            "description": "Leg recovery",
+                            "instructions": "Stand on one leg, grab your other foot and pull it toward your glute. Keep your knees together.",
+                            "cues": [
+                                "Stand tall",
+                                "Hips forward"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "cali-w1-d5",
+            "name": "Fat Burn (Low Impact)",
+            "blocks": [
+                {
+                    "id": "warmup",
+                    "name": "Warm-up",
+                    "type": "warmup",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "w1",
+                            "type": "timer",
+                            "name": "Torso Twists",
+                            "description": "Core warmup",
+                            "instructions": "Stand with feet hip-width and rotate your torso left and right, letting your arms swing freely.",
+                            "cues": [
+                                "Loose arms",
+                                "Pivot feet slightly"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                },
+                {
+                    "id": "circuit",
+                    "name": "Main Circuit",
+                    "type": "circuit",
+                    "rounds": 4,
+                    "steps": [
+                        {
+                            "id": "c1",
+                            "type": "exercise_inline",
+                            "name": "Marching in place",
+                            "description": "Steady cardio",
+                            "instructions": "Drive your knees high and swing your arms. Maintain a steady pace that gets your heart rate up.",
+                            "cues": [
+                                "High knees",
+                                "Active arms"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c2",
+                            "type": "exercise_inline",
+                            "name": "Shadow boxing",
+                            "description": "Upper body cardio",
+                            "instructions": "Perform light punches into the air. Keep your feet moving and rotate your core with each punch.",
+                            "cues": [
+                                "Relaxed shoulders",
+                                "Keep moving"
+                            ],
+                            "durationSeconds": 30
+                        },
+                        {
+                            "id": "c3",
+                            "type": "exercise_inline",
+                            "name": "Standing oblique crunch",
+                            "description": "Core and balance",
+                            "instructions": "Bring your knee up to the side while simultaneously bringing your elbow down to meet it. Squeeze your side.",
+                            "cues": [
+                                "Squeeze obliques",
+                                "Exhale on crunch"
+                            ],
+                            "durationSeconds": 30
+                        }
+                    ]
+                },
+                {
+                    "id": "cooldown",
+                    "name": "Cooldown",
+                    "type": "cooldown",
+                    "rounds": 1,
+                    "steps": [
+                        {
+                            "id": "cd1",
+                            "type": "hold",
+                            "name": "Full Body Relaxation",
+                            "description": "Calm recovery",
+                            "instructions": "Stand still, close your eyes, and take several deep breaths. Let all tension drain away.",
+                            "cues": [
+                                "Breathe out slow",
+                                "Relax face and jaw"
+                            ],
+                            "durationSeconds": 240
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
