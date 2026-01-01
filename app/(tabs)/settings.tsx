@@ -1,16 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput } from 'react-native';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
-import { initDatabase, clearAllLogs, clearAllPrograms, saveProgram } from '../../src/db/database';
+import { initDatabase, clearAllLogs, clearAllPrograms } from '../../src/db/database';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from '../../src/utils/notifications';
 import { Switch, Platform } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import pushups50 from '../../assets/programs/pushups_50.json';
-import calisthenics28 from '../../assets/programs/calisthenics_28.json';
-import hamstringStretch from '../../assets/programs/hamstring_stretch.json';
-import yogaMobility from '../../assets/programs/yoga_mobility.json';
 
 export default function SettingsScreen() {
     const router = useRouter();
@@ -119,7 +115,7 @@ export default function SettingsScreen() {
     const handleResetAll = async () => {
         Alert.alert(
             'Full Reset',
-            'This will delete ALL programs and progress, then reload default programs. Are you sure?',
+            'This will delete ALL programs and progress. You can import new programs from the Discover tab. Are you sure?',
             [
                 { text: 'Cancel', style: 'cancel' },
                 {
@@ -130,18 +126,7 @@ export default function SettingsScreen() {
                         await clearAllLogs(db);
                         await clearAllPrograms(db);
 
-                        // Reload defaults
-                        const defaults = [
-                            pushups50,
-                            calisthenics28,
-                            hamstringStretch,
-                            yogaMobility
-                        ];
-                        for (const p of defaults) {
-                            await saveProgram(db, p as any);
-                        }
-
-                        Alert.alert('Success', 'Everything has been reset and default programs reloaded.');
+                        Alert.alert('Success', 'Everything has been reset. Visit the Discover tab to import programs.');
                         router.replace('/(tabs)');
                     }
                 }
