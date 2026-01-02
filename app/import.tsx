@@ -11,7 +11,7 @@ import {
 import { Colors, Typography, Spacing } from '../src/constants/theme';
 import { ProgramSchema } from '../src/schemas/schema';
 import { initDatabase, saveProgram } from '../src/db/database';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { X, FileJson, Sparkles, ArrowRight, Save, Trash2 } from 'lucide-react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
@@ -24,11 +24,12 @@ type ImportStep = 'input' | 'preview';
 type ImportTab = 'ai' | 'manual';
 
 export default function ImportScreen() {
+  const router = useRouter();
+  const { tab } = useLocalSearchParams<{ tab: ImportTab }>();
   const [step, setStep] = useState<ImportStep>('input');
-  const [activeTab, setActiveTab] = useState<ImportTab>('ai');
+  const [activeTab, setActiveTab] = useState<ImportTab>(tab || 'ai');
   const [jsonText, setJsonText] = useState('');
   const [pendingProgram, setPendingProgram] = useState<Program | null>(null);
-  const router = useRouter();
 
   const cleanJsonString = (str: string) => {
     // Strip markdown code blocks (```json ... ```)
@@ -198,7 +199,7 @@ export default function ImportScreen() {
 
               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmImport}>
                 <Save color={Colors.background} size={20} />
-                <Text style={styles.confirmButtonText}>Import to Library</Text>
+                <Text style={styles.confirmButtonText}>Import Program</Text>
               </TouchableOpacity>
             </View>
           </>

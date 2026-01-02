@@ -396,6 +396,7 @@ export default function SettingsScreen() {
         confirmTime={confirmTime}
         healthEnabled={healthEnabled}
         setHealthEnabled={setHealthEnabled}
+        onShowWelcome={() => router.push('/welcome')}
       />
 
       <FeedbackSection

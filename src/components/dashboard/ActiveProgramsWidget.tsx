@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Colors, Typography, Spacing } from '../../constants/theme';
-import { Play } from 'lucide-react-native';
+import { Play, Dumbbell } from 'lucide-react-native';
 import { dashboardStyles as styles } from './DashboardStyles';
 import { Program, Workout } from '../../schemas/schema';
 
@@ -18,24 +18,13 @@ interface ActiveSession {
 interface ActiveProgramsWidgetProps {
   sessions: ActiveSession[];
   onSessionPress: (session: ActiveSession) => void;
-  onBrowsePress: () => void;
 }
 
 export const ActiveProgramsWidget: React.FC<ActiveProgramsWidgetProps> = ({
   sessions,
   onSessionPress,
-  onBrowsePress,
 }) => {
-  if (sessions.length === 0) {
-    return (
-      <View style={styles.emptyHero}>
-        <Text style={Typography.bodySecondary}>No active programs yet.</Text>
-        <TouchableOpacity onPress={onBrowsePress}>
-          <Text style={{ color: Colors.primary, marginTop: Spacing.sm }}>Browse programs</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (sessions.length === 0) return null;
 
   return (
     <View style={styles.section}>

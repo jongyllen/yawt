@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { Colors } from '../../constants/theme';
+import { Colors, Typography } from '../../constants/theme';
 import { Flame, Check } from 'lucide-react-native';
 import { dashboardStyles as styles } from './DashboardStyles';
 
@@ -11,7 +11,20 @@ interface StreakWidgetProps {
 }
 
 export const StreakWidget: React.FC<StreakWidgetProps> = ({ current, longest, completedToday }) => {
-  if (current <= 0) return null;
+  if (current <= 0) {
+    return (
+      <View style={styles.streakCard}>
+        <View style={styles.streakMain}>
+          <Flame color={Colors.textTertiary} size={32} />
+          <View style={styles.streakInfo}>
+            <Text style={styles.streakLabel}>0 Day Streak</Text>
+            <Text style={[Typography.caption, { color: Colors.textTertiary }]}>No workouts yet</Text>
+          </View>
+        </View>
+        <Text style={styles.keepGoingText}>Start your first workout!</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.streakCard}>

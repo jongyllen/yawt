@@ -6,6 +6,8 @@ export const dashboardStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: Spacing.xl,
+    marginBottom: Spacing.sm,
   },
   streakBadge: {
     flexDirection: 'row',

@@ -13,8 +13,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ userName, curr
   return (
     <View style={styles.headerRow}>
       <View style={{ flex: 1, marginRight: Spacing.md }}>
+        <Text style={[Typography.h3, { color: Colors.primary, letterSpacing: 0.5, marginBottom: 4, fontSize: 13 }]}>
+          Yet Another Workout Tracker
+        </Text>
         <Text style={Typography.h1} numberOfLines={1} ellipsizeMode="tail">
           {userName ? `Hello, ${userName}` : 'Today'}
+        </Text>
+        <Text style={[Typography.caption, { color: Colors.textTertiary, marginTop: -2 }]}>
+          Ready for your next session?
         </Text>
       </View>
       <View style={[styles.streakBadge, currentStreak > 0 && styles.streakBadgeActive]}>

@@ -61,6 +61,10 @@ export default function RootLayout() {
             options={{ presentation: 'fullScreenModal', headerShown: false }}
           />
           <Stack.Screen
+            name="welcome"
+            options={{ presentation: 'fullScreenModal', headerShown: false }}
+          />
+          <Stack.Screen
             name="import"
             options={{ presentation: 'modal', title: 'Import Program' }}
           />

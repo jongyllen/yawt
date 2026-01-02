@@ -9,17 +9,18 @@ import {
   Alert,
 } from 'react-native';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
-import { Plus, ChevronRight, Globe, Library, RefreshCw } from 'lucide-react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { Plus, ChevronRight, Globe, Dumbbell, RefreshCw } from 'lucide-react-native';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { getPrograms, initDatabase } from '../../src/db/database';
 import { Program } from '../../src/schemas/schema';
 import { fetchRegistry, RegistryEntry } from '../../src/utils/registry';
 
-type Tab = 'library' | 'discover';
+type Tab = 'my_programs' | 'discover';
 
 export default function ProgramsScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>('library');
+  const { tab } = useLocalSearchParams<{ tab: Tab }>();
+  const [activeTab, setActiveTab] = useState<Tab>(tab || 'my_programs');
   const [programs, setPrograms] = useState<Program[]>([]);
   const [registryEntries, setRegistryEntries] = useState<RegistryEntry[]>([]);
   const [isRegistryLoading, setIsRegistryLoading] = useState(false);
@@ -43,7 +44,7 @@ export default function ProgramsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (activeTab === 'library') {
+      if (activeTab === 'my_programs') {
         loadPrograms();
       }
     }, [loadPrograms, activeTab])
@@ -95,22 +96,23 @@ export default function ProgramsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={Typography.h1}>Programs</Text>
-        <TouchableOpacity onPress={() => router.push('/import')} style={styles.addButton}>
-          <Plus color={Colors.primary} size={24} />
+        <TouchableOpacity onPress={() => router.push('/import')} style={styles.importButton}>
+          <Plus color={Colors.primary} size={18} />
+          <Text style={styles.importButtonText}>New Program</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'library' && styles.activeTab]}
-          onPress={() => setActiveTab('library')}
+          style={[styles.tab, activeTab === 'my_programs' && styles.activeTab]}
+          onPress={() => setActiveTab('my_programs')}
         >
-          <Library
-            color={activeTab === 'library' ? Colors.background : Colors.textSecondary}
+          <Dumbbell
+            color={activeTab === 'my_programs' ? Colors.background : Colors.textSecondary}
             size={18}
           />
-          <Text style={[styles.tabText, activeTab === 'library' && styles.activeTabText]}>
-            Library
+          <Text style={[styles.tabText, activeTab === 'my_programs' && styles.activeTabText]}>
+            My Programs
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -127,7 +129,7 @@ export default function ProgramsScreen() {
         </TouchableOpacity>
       </View>
 
-      {activeTab === 'library' ? (
+      {activeTab === 'my_programs' ? (
         <FlatList
           data={programs}
           keyExtractor={(item) => item.id}
@@ -222,10 +224,21 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: Colors.background,
   },
-  addButton: {
-    padding: Spacing.sm,
+  importButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.card,
     borderRadius: 99,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  importButtonText: {
+    ...Typography.caption,
+    color: Colors.primary,
+    fontWeight: 'bold',
   },
   listContent: {
     paddingHorizontal: Spacing.lg,

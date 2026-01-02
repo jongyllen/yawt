@@ -48,8 +48,8 @@ export default function DiscoverDetailScreen() {
     try {
       const db = await initDatabase();
       await saveProgram(db, program);
-      Alert.alert('Success', `${program.name} has been added to your library!`, [
-        { text: 'View Library', onPress: () => router.replace('/(tabs)/programs') },
+      Alert.alert('Success', `${program.name} has been added to My Programs!`, [
+        { text: 'View Programs', onPress: () => router.replace('/(tabs)/programs') },
         { text: 'OK', style: 'cancel' },
       ]);
     } catch (error) {
@@ -99,7 +99,7 @@ export default function DiscoverDetailScreen() {
 
             <TouchableOpacity style={styles.importButton} onPress={handleImport}>
               <Download color={Colors.background} size={20} />
-              <Text style={styles.importButtonText}>Import to Library</Text>
+              <Text style={styles.importButtonText}>Import Program</Text>
             </TouchableOpacity>
           </View>
         ) : (

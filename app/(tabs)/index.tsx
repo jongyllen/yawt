@@ -14,12 +14,14 @@ import { Program, Workout, WorkoutLog } from '../../src/schemas/schema';
 import { calculateStreak, workedOutToday } from '../../src/utils/streak';
 import { saveWidgetData } from '../../src/utils/widgetData';
 import * as CloudSync from '../../src/utils/cloudSync';
+import { hasSeenWelcome } from '../../src/utils/onboarding';
 
 // Dashboard Components
 import { DashboardHeader } from '../../src/components/dashboard/DashboardHeader';
 import { StreakWidget } from '../../src/components/dashboard/StreakWidget';
 import { ActiveProgramsWidget } from '../../src/components/dashboard/ActiveProgramsWidget';
 import { RecentActivityWidget } from '../../src/components/dashboard/RecentActivityWidget';
+import { DashboardEmptyState } from '../../src/components/dashboard/DashboardEmptyState';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -79,7 +81,13 @@ export default function TodayScreen() {
 
     // Sync with cloud if enabled
     await CloudSync.syncIfNewer();
-  }, []);
+
+    // Check onboarding
+    const seen = await hasSeenWelcome();
+    if (!seen) {
+      router.replace('/welcome');
+    }
+  }, [router]);
 
   useFocusEffect(
     useCallback(() => {
@@ -109,13 +117,20 @@ export default function TodayScreen() {
         completedToday={completedToday}
       />
 
-      <ActiveProgramsWidget
-        sessions={activeSessions}
-        onSessionPress={handleSessionPress}
-        onBrowsePress={() => router.push('/programs')}
-      />
-
-      <RecentActivityWidget logs={logs} />
+      {activeSessions.length > 0 ? (
+        <>
+          <ActiveProgramsWidget
+            sessions={activeSessions}
+            onSessionPress={handleSessionPress}
+          />
+          <RecentActivityWidget logs={logs} />
+        </>
+      ) : (
+        <DashboardEmptyState
+          onBrowsePress={() => router.push('/programs')}
+          onImportPress={() => router.push('/import')}
+        />
+      )}
     </ScrollView>
   );
 }

@@ -15,6 +15,7 @@ interface GeneralSectionProps {
   confirmTime: () => void;
   healthEnabled: boolean;
   setHealthEnabled: (value: boolean) => void;
+  onShowWelcome: () => void;
 }
 
 export const GeneralSection: React.FC<GeneralSectionProps> = ({
@@ -27,6 +28,7 @@ export const GeneralSection: React.FC<GeneralSectionProps> = ({
   confirmTime,
   healthEnabled,
   setHealthEnabled,
+  onShowWelcome,
 }) => {
   return (
     <View style={styles.section}>
@@ -92,7 +94,7 @@ export const GeneralSection: React.FC<GeneralSectionProps> = ({
                 Alert.alert(
                   'HealthKit Error',
                   result.error ||
-                    'Failed to initialize Apple Health. Please check your system settings.',
+                  'Failed to initialize Apple Health. Please check your system settings.',
                   [{ text: 'OK' }]
                 );
               }
@@ -102,6 +104,14 @@ export const GeneralSection: React.FC<GeneralSectionProps> = ({
           />
         </View>
       )}
+
+      <TouchableOpacity style={[styles.item, styles.rowItem]} onPress={onShowWelcome}>
+        <View>
+          <Text style={Typography.body}>Show Welcome Screen</Text>
+          <Text style={Typography.caption}>View the onboarding guide again</Text>
+        </View>
+        <Text style={[Typography.body, { color: Colors.primary, fontWeight: 'bold' }]}>View</Text>
+      </TouchableOpacity>
     </View>
   );
 };
