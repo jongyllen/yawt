@@ -1,143 +1,62 @@
-# yawt (Yet Another Workout Tracker)
+# 🏋️‍♂️ YAWT (Yet Another Workout Tracker)
 
-A minimal, schema-driven workout application built with Expo and React Native.
+A premium, schema-driven workout application designed for performance, progress visualization, and achievement recognition. Built with Expo and React Native.
 
-## Features
+---
 
-- **Schema-Driven Programs**: Define complex multi-week workout programs using simple, extensible JSON patterns.
-- **Focused Workout Experience**: A minimalist UI designed specifically for use during active training sessions, minimizing distractions while keeping essential data at your fingertips.
-- **Local-First Data**: All workout logs and progress are stored locally using SQLite, ensuring your data remains private and accessible without an internet connection.
-- **Easy Sharing & Import**: Seamlessly export your custom programs or import others' programs via JSON sharing.
-- **Program Discovery**: Browse and explore available programs to find the one that fits your goals.
-- **Developer-Friendly**: Built with Zod for robust schema validation and Expo for a modern cross-platform development experience.
+## ✨ Core Features
 
-## GitHub Integration & Program Discovery
+### 📈 Intelligence & Progress
+- **Personal Records (PRs)**: Automatically detects when you hit a new high in weight, reps, or duration. Celebrated with a custom "Gold Medal" haptic pattern.
+- **Visual Trends**: Beautifully rendered charts for "Workouts per Week" and "Muscle Group Distribution" help you see your work pay off.
+- **Detailed History**: Retroactive scanning of your workout history to populate your PR trophies instantly.
 
-YAWT can discover and import workout programs directly from any public GitHub repository. This allows you to share your custom programs or browse community-created workouts.
+### 🎯 Focused Workout Player
+- **Real-time Adjustments**: Life happens. Adjust your reps or weight mid-set to reflect your actual performance—your logs will stay accurate.
+- **Dynamic Rest Timers**: Automated rest periods based on your program schema.
+- **Live Activities**: (iOS) Keep track of your rest timer and current set directly from your Lock Screen or Dynamic Island.
 
-### How It Works
+### 🧠 Seamless Integration
+- **Apple Health Sync**: Automatically sync your workouts to Apple Health to close your activity rings.
+- **AI Workout Generator**: Create entire multi-week programs just by describing your goals.
+- **iCloud Backup**: Securely sync your data across your devices.
 
-The **Discover** tab in the Programs screen fetches a registry of available programs from a GitHub repository. By default, it points to [`jongyllen/yawt-workouts`](https://github.com/jongyllen/yawt-workouts), but you can configure your own in **Settings → Discovery Registry**.
+### 🛠️ Developer & Community Friendly
+- **Schema-Driven**: Programs are defined by JSON, making them easy to share, version, and import.
+- **GitHub Discovery**: Import workout registries directly from GitHub repositories.
 
-### Setting Up Your Own Workout Registry
+---
 
-To host your own programs on GitHub:
-
-1. **Create a public repository** on GitHub
-
-2. **Add a `registry.json`** file at the root with this structure:
-
-   ```json
-   {
-     "programs": [
-       {
-         "id": "unique-program-id",
-         "name": "My Workout Program",
-         "description": "A brief description of the program",
-         "author": "Your Name",
-         "path": "programs/my-workout.json"
-       }
-     ]
-   }
-   ```
-
-3. **Add your program JSON files** in the paths specified in the registry. Each program must follow the YAWT program schema (validated with Zod).
-
-4. **Configure the app** to use your repository:
-   - Go to **Settings → Discovery Registry**
-   - Enter your repository as `username/repo-name`
-   - Optionally specify a branch (defaults to `main`)
-
-### Example Program Structure
-
-Programs follow a schema with workouts containing blocks and steps:
-
-```json
-{
-  "id": "my-program",
-  "version": "workout.program.v1",
-  "name": "My Program",
-  "description": "Program description",
-  "workouts": [
-    {
-      "id": "workout-1",
-      "name": "Day 1",
-      "blocks": [
-        {
-          "id": "block-1",
-          "name": "Main Set",
-          "type": "main",
-          "rounds": 3,
-          "restBetweenRounds": 60,
-          "steps": [
-            {
-              "id": "step-1",
-              "type": "exercise_inline",
-              "name": "Push-ups",
-              "reps": 10,
-              "cues": ["Full lockout", "Core tight"]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-For multi-week programs, add a `weeks` array to schedule workouts across days:
-
-```json
-{
-  "weeks": [
-    {
-      "weekNumber": 1,
-      "workouts": [
-        { "dayNumber": 1, "workoutId": "workout-1" },
-        { "dayNumber": 3, "workoutId": "workout-2" }
-      ]
-    }
-  ]
-}
-```
-
-See the [yawt-workouts repository](https://github.com/jongyllen/yawt-workouts) for complete examples.
-
-## Tech Stack
-
-- **Framework**: [Expo](https://expo.dev/) (React Native)
-- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/)
-- **Database**: [Expo SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/)
-- **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
-- **Validation**: [Zod](https://zod.dev/)
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js (LTS recommended)
-- npm or yarn
+- [Node.js](https://nodejs.org/) (LTS)
+- [Expo Go](https://expo.dev/expo-go) (for quick local testing) or [TestFlight](https://developer.apple.com/testflight/)
 
 ### Installation
+1.  Clone and install:
+    ```bash
+    git clone https://github.com/jongyllen/yawt.git
+    cd yawt
+    npm install
+    ```
+2.  Launch the development server:
+    ```bash
+    npm start
+    ```
 
-1. Clone the repository:
+For detailed build instructions, simulator setup, and release procedures, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
-   ```bash
-   git clone https://github.com/jongyllen/yawt.git
-   cd yawt
-   ```
+---
 
-2. Install dependencies:
+## 🔧 Technical Stack
+- **Engine**: [Expo](https://expo.dev/) / React Native
+- **Storage**: [SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) (Local-first)
+- **Validation**: [Zod](https://zod.dev/)
+- **Icons**: [Lucide React Native](https://lucide.dev/)
+- **Styling**: Modern, high-contrast dark theme with glassmorphic accents.
 
-   ```bash
-   npm install
-   ```
+---
 
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+## 📜 License
+Internal and Community usage allowed under the [MIT License](LICENSE).

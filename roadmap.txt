@@ -3,10 +3,6 @@
 1. 🍎 The "Apple Ecosystem" Layer
 Apple Watch Companion: For workouts, the phone is often an obstacle. A lightweight Watch app to tap "Next Set" is the ultimate premium feature.
 
-2. 📈 Intelligence & Progress
-Visual Trends: The "Stats" screen currently lists counts. Adding charts for "Workouts per Week" or "Muscle Group Distribution" would make the progress feel real.
-Personal Records (PRs): Auto-detecting when you lift more or do more reps and celebrating it with a "Gold Medal" haptic alert.
-
 3. 🛠️ Content & Customization
 In-App Workout Editor: Currently, you're a "Consumer" of programs. Being able to swap an exercise (e.g., "I don't have a bench, let's do pushups") or create a program from scratch in the UI would be a game-changer.
 

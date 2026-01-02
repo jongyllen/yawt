@@ -15,13 +15,16 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yawt.app",
+      "buildNumber": "1",
       "deploymentTarget": "16.2",
       "usesIcloudStorage": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "usesAppleSignIn": true,
         "NSSupportsLiveActivities": true,
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -71,7 +71,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		FCB50D1F2F08167A005A7868 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		FCB50D1F2F08167A005A7868 /* Exceptions for "WorkoutLiveActivity" folder in "WorkoutLiveActivityExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -84,7 +84,7 @@
 		FC5B67682F08134500CB6F0A /* WorkoutLiveActivity */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				FCB50D1F2F08167A005A7868 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				FCB50D1F2F08167A005A7868 /* Exceptions for "WorkoutLiveActivity" folder in "WorkoutLiveActivityExtension" target */,
 			);
 			explicitFileTypes = {
 			};
@@ -254,8 +254,6 @@
 				FC5B67682F08134500CB6F0A /* WorkoutLiveActivity */,
 			);
 			name = WorkoutLiveActivityExtension;
-			packageProductDependencies = (
-			);
 			productName = WorkoutLiveActivityExtension;
 			productReference = FC5B67632F08134500CB6F0A /* WorkoutLiveActivityExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -510,7 +508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -518,7 +516,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yawt.app;
-				PRODUCT_NAME = "YAWT";
+				PRODUCT_NAME = YAWT;
 				SWIFT_OBJC_BRIDGING_HEADER = "YAWT/YAWT-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -545,7 +543,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -553,7 +551,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yawt.app;
-				PRODUCT_NAME = "YAWT";
+				PRODUCT_NAME = YAWT;
 				SWIFT_OBJC_BRIDGING_HEADER = "YAWT/YAWT-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -711,9 +709,10 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yawt.app.WorkoutLiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -761,8 +760,9 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yawt.app.WorkoutLiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
