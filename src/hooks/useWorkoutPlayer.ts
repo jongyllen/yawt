@@ -9,10 +9,10 @@ interface UseWorkoutPlayerProps {
         stepIndex: number;
         round: number;
     };
-    onFinish: () => void;
+    onFinish?: () => void; // Optional: still kept for backward compatibility if needed, but not used for auto-redirect
 }
 
-export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorkoutPlayerProps) {
+export function useWorkoutPlayer({ workout, initialIndexes }: UseWorkoutPlayerProps) {
     const [currentBlockIndex, setCurrentBlockIndex] = useState(initialIndexes?.blockIndex ?? 0);
     const [currentStepIndex, setCurrentStepIndex] = useState(initialIndexes?.stepIndex ?? 0);
     const [currentRound, setCurrentRound] = useState(initialIndexes?.round ?? 1);
@@ -27,7 +27,7 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
     useEffect(() => {
         Feedback.initAudio();
         Feedback.loadFeedbackSettings();
-        
+
         return () => {
             Feedback.cleanupAudio();
         };
@@ -99,12 +99,12 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
             setCurrentRound(1);
         } else {
             // Workout complete!
+            // We set isFinished to true, which should be handled by the UI to show a summary
             Feedback.onWorkoutComplete();
             setIsFinished(true);
             setIsPaused(true);
-            onFinish();
         }
-    }, [workout, currentBlockIndex, currentStepIndex, currentRound, onFinish]);
+    }, [workout, currentBlockIndex, currentStepIndex, currentRound]);
 
     const handleBack = useCallback(() => {
         Feedback.onGoBack();
@@ -140,6 +140,15 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
         return totalSteps > 0 ? currentLinearIndex / totalSteps : 0;
     }, [workout, currentBlockIndex, currentStepIndex, currentRound]);
 
+    const getIsLastStep = useCallback(() => {
+        if (!workout) return false;
+        const isLastBlock = currentBlockIndex === workout.blocks.length - 1;
+        const currentBlock = workout.blocks[currentBlockIndex];
+        const isLastRound = currentRound === currentBlock.rounds;
+        const isLastStepInBlock = currentStepIndex === currentBlock.steps.length - 1;
+        return isLastBlock && isLastRound && isLastStepInBlock;
+    }, [workout, currentBlockIndex, currentStepIndex, currentRound]);
+
     return {
         currentBlockIndex,
         currentStepIndex,
@@ -148,9 +157,11 @@ export function useWorkoutPlayer({ workout, initialIndexes, onFinish }: UseWorko
         isPaused,
         isFinished,
         setIsPaused,
+        setIsFinished,
         handleNext,
         handleBack,
         getProgress,
+        isLastStep: getIsLastStep(),
         currentBlock: workout?.blocks[currentBlockIndex] || null,
         currentStep: workout?.blocks[currentBlockIndex]?.steps[currentStepIndex] || null,
     };

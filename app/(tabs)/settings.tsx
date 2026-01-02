@@ -8,16 +8,22 @@ import * as Notifications from '../../src/utils/notifications';
 import * as Feedback from '../../src/utils/feedback';
 import { Switch, Platform } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
+import { documentDirectory, writeAsStringAsync, readAsStringAsync } from 'expo-file-system/legacy';
+import { getFullBackup, restoreFullBackup } from '../../src/db/database';
+import * as Health from '../../src/utils/health';
 
 export default function SettingsScreen() {
     const router = useRouter();
     const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
+    const [healthEnabled, setHealthEnabled] = React.useState(false);
     const [reminderTime, setReminderTime] = React.useState(new Date(new Date().setHours(9, 0, 0, 0)));
     const [showTimePicker, setShowTimePicker] = React.useState(false);
     const [userName, setUserName] = React.useState('');
     const [registryRepo, setRegistryRepo] = React.useState('jongyllen/yawt-workouts');
     const [registryBranch, setRegistryBranch] = React.useState('main');
-    
+
     // Feedback settings
     const [hapticsEnabled, setHapticsEnabled] = React.useState(true);
     const [countdownBeepsEnabled, setCountdownBeepsEnabled] = React.useState(true);
@@ -43,7 +49,10 @@ export default function SettingsScreen() {
 
         const branch = await AsyncStorage.getItem('registry_branch');
         if (branch) setRegistryBranch(branch);
-        
+
+        const healthSync = await Health.isHealthSyncEnabled();
+        setHealthEnabled(healthSync);
+
         // Load feedback settings
         await Feedback.loadFeedbackSettings();
         const feedbackSettings = Feedback.getFeedbackSettings();
@@ -123,6 +132,103 @@ export default function SettingsScreen() {
         );
     };
 
+    const handleExport = async () => {
+        try {
+            const db = await initDatabase();
+            const backup = await getFullBackup(db);
+
+            // Add AsyncStorage settings to backup
+            backup.settings = {
+                user_name: userName,
+                registry_repo: registryRepo,
+                registry_branch: registryBranch,
+                notifications_enabled: notificationsEnabled,
+                reminder_time: reminderTime.toISOString(),
+                haptics_enabled: hapticsEnabled,
+                countdown_beeps_enabled: countdownBeepsEnabled,
+            };
+
+            const fileName = `yawt_backup_${new Date().toISOString().split('T')[0]}.json`;
+            const fileUri = documentDirectory + fileName;
+
+            await writeAsStringAsync(fileUri, JSON.stringify(backup, null, 2));
+
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(fileUri);
+            } else {
+                Alert.alert('Sharing Unavailable', 'Your device does not support sharing files.');
+            }
+        } catch (e) {
+            console.error('Export error:', e);
+            Alert.alert('Error', 'Failed to create backup.');
+        }
+    };
+
+    const handleRestore = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/json',
+                copyToCacheDirectory: true,
+            });
+
+            if (result.canceled) return;
+
+            const fileContent = await readAsStringAsync(result.assets[0].uri);
+            const backup = JSON.parse(fileContent);
+
+            if (backup.version !== 'yawt.backup.v1') {
+                Alert.alert('Invalid Backup', 'The selected file is not a valid YAWT backup.');
+                return;
+            }
+
+            Alert.alert(
+                'Restore Backup',
+                'This will replace ALL current data with the contents of the backup. Continue?',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                        text: 'Restore',
+                        onPress: async () => {
+                            const db = await initDatabase();
+                            await restoreFullBackup(db, backup);
+
+                            // Restore settings
+                            if (backup.settings) {
+                                const s = backup.settings;
+                                if (s.user_name) await updateName(s.user_name);
+                                if (s.registry_repo) await updateRegistryRepo(s.registry_repo);
+                                if (s.registry_branch) await updateRegistryBranch(s.registry_branch);
+                                if (s.notifications_enabled !== undefined) {
+                                    setNotificationsEnabled(s.notifications_enabled);
+                                    await AsyncStorage.setItem('notifications_enabled', s.notifications_enabled.toString());
+                                }
+                                if (s.reminder_time) {
+                                    setReminderTime(new Date(s.reminder_time));
+                                    await AsyncStorage.setItem('reminder_time', s.reminder_time);
+                                }
+                                if (s.haptics_enabled !== undefined) {
+                                    setHapticsEnabled(s.haptics_enabled);
+                                    await Feedback.setFeedbackSetting('haptics', s.haptics_enabled);
+                                }
+                                if (s.countdown_beeps_enabled !== undefined) {
+                                    setCountdownBeepsEnabled(s.countdown_beeps_enabled);
+                                    await Feedback.setFeedbackSetting('countdown', s.countdown_beeps_enabled);
+                                }
+                            }
+
+                            Alert.alert('Success', 'Progress restored successfully.', [
+                                { text: 'OK', onPress: () => router.replace('/(tabs)') }
+                            ]);
+                        }
+                    }
+                ]
+            );
+        } catch (e) {
+            console.error('Restore error:', e);
+            Alert.alert('Error', 'Failed to restore backup. Make sure it is a valid YAWT JSON file.');
+        }
+    };
+
     const handleResetAll = async () => {
         Alert.alert(
             'Full Reset',
@@ -178,6 +284,7 @@ export default function SettingsScreen() {
                     />
                 </View>
 
+
                 {notificationsEnabled && (
                     <TouchableOpacity
                         style={[styles.item, styles.rowItem]}
@@ -207,6 +314,35 @@ export default function SettingsScreen() {
                                 <Text style={styles.doneButtonText}>Done</Text>
                             </TouchableOpacity>
                         )}
+                    </View>
+                )}
+
+                {Platform.OS === 'ios' && (
+                    <View style={[styles.item, styles.rowItem]}>
+                        <View>
+                            <Text style={Typography.body}>Sync with Apple Health</Text>
+                            <Text style={Typography.caption}>Contribute to your Activity Rings</Text>
+                        </View>
+                        <Switch
+                            value={healthEnabled}
+                            onValueChange={async (value) => {
+                                setHealthEnabled(value);
+                                const result = await Health.setHealthSyncEnabled(value);
+                                if (value && !result.success) {
+                                    setHealthEnabled(false);
+                                    Alert.alert(
+                                        'HealthKit Error',
+                                        result.error || 'Failed to initialize Apple Health. Please check your system settings.',
+                                        [
+                                            { text: 'OK' },
+                                            { text: 'System Settings', onPress: () => { /* Logic to open settings if needed */ } }
+                                        ]
+                                    );
+                                }
+                            }}
+                            trackColor={{ false: Colors.surface, true: Colors.primary }}
+                            thumbColor={Colors.text}
+                        />
                     </View>
                 )}
 
@@ -271,6 +407,18 @@ export default function SettingsScreen() {
                         autoCapitalize="none"
                     />
                 </View>
+            </View>
+
+            <View style={styles.section}>
+                <Text style={Typography.h3}>Backup & Sync</Text>
+                <TouchableOpacity style={styles.item} onPress={handleExport}>
+                    <Text style={Typography.body}>Export Backup</Text>
+                    <Text style={Typography.caption}>Save your progress and programs to a file</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.item} onPress={handleRestore}>
+                    <Text style={Typography.body}>Restore Backup</Text>
+                    <Text style={Typography.caption}>Load progress from a previously saved file</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.section}>

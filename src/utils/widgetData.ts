@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import SharedGroupPreferences from 'react-native-shared-group-preferences';
 import WidgetCenter from 'react-native-widget-center';
+import * as Device from 'expo-device';
 
 // Keys for widget data storage
 const WIDGET_DATA_KEY = 'widget_data';
@@ -39,14 +40,17 @@ export async function saveWidgetData(data: WidgetData): Promise<void> {
         }
 
         // Save to Shared App Group on iOS
-        if (Platform.OS === 'ios' && SharedGroupPreferences) {
+        // Only attempt on real device as App Groups are not available/reliable in Simulator
+        if (Platform.OS === 'ios' && Device.isDevice && SharedGroupPreferences) {
             try {
                 const APP_GROUP = 'group.com.yawt.app';
                 // Save the entire object as a string for reliability
                 await SharedGroupPreferences.setItem('widgetData', JSON.stringify(data), APP_GROUP);
 
                 // Force an immediate reload of the iOS widget
-                WidgetCenter.reloadAllTimelines();
+                if (WidgetCenter && WidgetCenter.reloadAllTimelines) {
+                    WidgetCenter.reloadAllTimelines();
+                }
                 console.log('Successfully saved and reloaded iOS widget data');
             } catch (e) {
                 console.error('Error saving to iOS App Group:', e);

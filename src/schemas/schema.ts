@@ -91,6 +91,7 @@ export const ActiveProgramSchema = z.object({
   lastStepIndex: z.number().optional(),
   lastRound: z.number().optional(),
   lastWorkoutId: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 export type ActiveProgram = z.infer<typeof ActiveProgramSchema>;

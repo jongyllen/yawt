@@ -46,7 +46,11 @@ export const initDatabase = async () => {
     } catch (e) {
         // Column might already exist
     }
-
+    try {
+        await db.execAsync('ALTER TABLE active_programs ADD COLUMN updated_at DATETIME;');
+    } catch (e) {
+        // Column might already exist
+    }
     return db;
 };
 
@@ -96,25 +100,28 @@ export const getWorkoutLogsByProgram = async (db: SQLite.SQLiteDatabase, program
 
 export const startProgram = async (db: SQLite.SQLiteDatabase, programId: string) => {
     const id = Math.random().toString(36).substring(7);
+    const now = new Date().toISOString();
     const activeProgram: ActiveProgram = {
         id,
         programId,
-        startDate: new Date().toISOString(),
+        startDate: now,
         status: 'active',
+        updatedAt: now,
     };
     await db.runAsync(
-        'INSERT INTO active_programs (id, program_id, status, data) VALUES (?, ?, ?, ?)',
+        'INSERT INTO active_programs (id, program_id, status, data, updated_at) VALUES (?, ?, ?, ?, ?)',
         activeProgram.id,
         activeProgram.programId,
         activeProgram.status,
-        JSON.stringify(activeProgram)
+        JSON.stringify(activeProgram),
+        now
     );
     return activeProgram;
 };
 
 export const getActivePrograms = async (db: SQLite.SQLiteDatabase): Promise<ActiveProgram[]> => {
     try {
-        const rows = await db.getAllAsync<{ data: string }>('SELECT data FROM active_programs WHERE status = "active"');
+        const rows = await db.getAllAsync<{ data: string }>('SELECT data FROM active_programs WHERE status = "active" ORDER BY updated_at DESC');
         return rows.map(row => {
             try {
                 return JSON.parse(row.data);
@@ -139,10 +146,13 @@ export const getActiveProgramByProgramId = async (db: SQLite.SQLiteDatabase, pro
 };
 
 export const updateActiveProgram = async (db: SQLite.SQLiteDatabase, activeProgram: ActiveProgram) => {
+    const now = new Date().toISOString();
+    activeProgram.updatedAt = now;
     await db.runAsync(
-        'UPDATE active_programs SET data = ?, status = ? WHERE id = ?',
+        'UPDATE active_programs SET data = ?, status = ?, updated_at = ? WHERE id = ?',
         JSON.stringify(activeProgram),
         activeProgram.status,
+        now,
         activeProgram.id
     );
 };
@@ -209,5 +219,57 @@ export const clearAllPrograms = async (db: SQLite.SQLiteDatabase) => {
 export const savePrograms = async (db: SQLite.SQLiteDatabase, programs: Program[]) => {
     for (const program of programs) {
         await saveProgram(db, program);
+    }
+};
+
+/**
+ * Get all data for backup
+ */
+export const getFullBackup = async (db: SQLite.SQLiteDatabase): Promise<any> => {
+    const programs = await getPrograms(db);
+    const logs = await getWorkoutLogs(db);
+    const activePrograms = await db.getAllAsync<{ data: string }>('SELECT data FROM active_programs');
+
+    return {
+        version: 'yawt.backup.v1',
+        timestamp: new Date().toISOString(),
+        programs,
+        workoutLogs: logs,
+        activePrograms: activePrograms.map(row => JSON.parse(row.data))
+    };
+};
+
+/**
+ * Restore from backup data
+ */
+export const restoreFullBackup = async (db: SQLite.SQLiteDatabase, backup: any) => {
+    if (backup.version !== 'yawt.backup.v1') {
+        throw new Error('Invalid backup version');
+    }
+
+    // Clear everything
+    await db.execAsync('DELETE FROM active_programs');
+    await db.execAsync('DELETE FROM workout_logs');
+    await db.execAsync('DELETE FROM programs');
+
+    // Restore Programs
+    for (const program of backup.programs) {
+        await saveProgram(db, program);
+    }
+
+    // Restore Logs
+    for (const log of backup.workoutLogs) {
+        await saveWorkoutLog(db, log);
+    }
+
+    // Restore Active Programs
+    for (const ap of backup.activePrograms) {
+        await db.runAsync(
+            'INSERT INTO active_programs (id, program_id, status, data) VALUES (?, ?, ?, ?)',
+            ap.id,
+            ap.programId,
+            ap.status,
+            JSON.stringify(ap)
+        );
     }
 };

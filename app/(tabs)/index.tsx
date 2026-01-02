@@ -72,7 +72,11 @@ export default function TodayScreen() {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.headerRow}>
-                <Text style={Typography.h1}>{userName ? `Hello, ${userName}` : 'Today'}</Text>
+                <View style={{ flex: 1, marginRight: Spacing.md }}>
+                    <Text style={Typography.h1} numberOfLines={1} ellipsizeMode="tail">
+                        {userName ? `Hello, ${userName}` : 'Today'}
+                    </Text>
+                </View>
                 <View style={[styles.streakBadge, streak.current > 0 && styles.streakBadgeActive]}>
                     <Flame
                         color={streak.current > 0 ? Colors.warning : Colors.textTertiary}

@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -48,7 +48,14 @@
           ]
         }
       ],
-      "./plugins/withStreakWidget"
+      "./plugins/withStreakWidget",
+      [
+        "react-native-health",
+        {
+          "healthSharePermission": "YAWT uses your health data to sync your workout history.",
+          "healthUpdatePermission": "YAWT saves your completed workouts to help you close your activity rings."
+        }
+      ]
     ],
     "extra": {
       "router": {},

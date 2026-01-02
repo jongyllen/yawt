@@ -1,0 +1,18 @@
+🚀 YAWT: The "Pro" Roadmap
+You’ve built a fantastic foundation. The app is fast, branding is tight, and it has the "utility" feel of a pro tool. Based on a quick audit of the code, here’s what’s missing to take this from an MVP to a "Top 100 Fitness App":
+
+1. 🍎 The "Apple Ecosystem" Layer
+Live Activities & Dynamic Island: Show the current set, reps, or rest-timer right on the Lock Screen while the app is in the background.
+Apple Watch Companion: For workouts, the phone is often an obstacle. A lightweight Watch app to tap "Next Set" is the ultimate premium feature.
+
+2. 📈 Intelligence & Progress
+Visual Trends: The "Stats" screen currently lists counts. Adding charts for "Workouts per Week" or "Muscle Group Distribution" would make the progress feel real.
+Personal Records (PRs): Auto-detecting when you lift more or do more reps and celebrating it with a "Gold Medal" haptic alert.
+
+3. 🛠️ Content & Customization
+In-App Workout Editor: Currently, you're a "Consumer" of programs. Being able to swap an exercise (e.g., "I don't have a bench, let's do pushups") or create a program from scratch in the UI would be a game-changer.
+Smart Rest Timers: Adaptive timers that suggest longer rest for heavy strength sets and shorter for accessory work.
+
+4. 🔗 Seamless Connectivity
+Cloud Sync: While JSON backups are safe, "Sign in with Apple" + silent iCloud sync would make moving to a new iPhone feel like magic.
+Program Sharing 2.0: Generating a unique URL or QR code so you can text a program to a friend for a "One-tap Import."
