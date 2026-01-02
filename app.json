@@ -15,10 +15,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yawt.app",
+      "deploymentTarget": "16.2",
       "usesIcloudStorage": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "usesAppleSignIn": true
+        "usesAppleSignIn": true,
+        "NSSupportsLiveActivities": true,
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -36,6 +41,7 @@
     "plugins": [
       "expo-router",
       "expo-sqlite",
+      "expo-notifications",
       [
         "react-native-health",
         {
@@ -51,7 +57,8 @@
           "iCloudContainerIdentifier": "iCloud.com.yawt.app"
         }
       ],
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "./plugins/withLiveActivities"
     ],
     "extra": {
       "router": {},

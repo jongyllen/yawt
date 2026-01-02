@@ -31,6 +31,7 @@ export default function SettingsScreen() {
     // Feedback settings
     const [hapticsEnabled, setHapticsEnabled] = React.useState(true);
     const [countdownBeepsEnabled, setCountdownBeepsEnabled] = React.useState(true);
+    const [autoPlayEnabled, setAutoPlayEnabled] = React.useState(false);
 
     // Cloud Sync state
     const [cloudSyncEnabled, setCloudSyncEnabled] = React.useState(false);
@@ -68,6 +69,7 @@ export default function SettingsScreen() {
         const feedbackSettings = Feedback.getFeedbackSettings();
         setHapticsEnabled(feedbackSettings.hapticsEnabled);
         setCountdownBeepsEnabled(feedbackSettings.countdownBeepsEnabled);
+        setAutoPlayEnabled(feedbackSettings.autoPlayEnabled);
 
         // Load Cloud Sync settings
         const syncEnabled = await CloudSync.isCloudSyncEnabled();
@@ -474,6 +476,21 @@ export default function SettingsScreen() {
                         onValueChange={async (value) => {
                             setCountdownBeepsEnabled(value);
                             await Feedback.setFeedbackSetting('countdown', value);
+                        }}
+                        trackColor={{ false: Colors.surface, true: Colors.primary }}
+                        thumbColor={Colors.text}
+                    />
+                </View>
+                <View style={[styles.item, styles.rowItem]}>
+                    <View>
+                        <Text style={Typography.body}>Auto-advance Timers</Text>
+                        <Text style={Typography.caption}>Move to next step when timer ends</Text>
+                    </View>
+                    <Switch
+                        value={autoPlayEnabled}
+                        onValueChange={async (value) => {
+                            setAutoPlayEnabled(value);
+                            await Feedback.setFeedbackSetting('autoplay', value);
                         }}
                         trackColor={{ false: Colors.surface, true: Colors.primary }}
                         thumbColor={Colors.text}

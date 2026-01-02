@@ -6,8 +6,8 @@ node_modules/
 .expo-shared/
 dist/
 web-build/
-ios/
-android/
+# ios/
+# android/
 
 # Native builds
 *.orig.*

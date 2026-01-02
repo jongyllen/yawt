@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 import Constants from 'expo-constants';
 
 const getAudio = () => {
@@ -17,17 +17,32 @@ const getAudio = () => {
     }
 };
 
+const getNotifications = () => {
+    // Silently skip in Expo Go on Android to avoid noisy native error
+    if (Platform.OS === 'android' && Constants.executionEnvironment === 'storeClient') {
+        return null;
+    }
+
+    try {
+        return require('expo-notifications');
+    } catch (e) {
+        return null;
+    }
+};
+
 // Settings keys
 const SETTINGS_KEYS = {
     SOUND_ENABLED: 'feedback_sound_enabled',
     HAPTICS_ENABLED: 'feedback_haptics_enabled',
     COUNTDOWN_BEEPS: 'feedback_countdown_beeps',
+    AUTO_PLAY: 'workout_auto_play',
 };
 
 // Cached settings
 let soundEnabled = true;
 let hapticsEnabled = true;
 let countdownBeepsEnabled = true;
+let autoPlayEnabled = false; // Default to false as requested
 let settingsLoaded = false;
 
 // Sound instances (using lazy type)
@@ -39,15 +54,17 @@ let completionSound: any = null;
  */
 export async function loadFeedbackSettings(): Promise<void> {
     try {
-        const [sound, haptics, countdown] = await Promise.all([
+        const [sound, haptics, countdown, autoPlay] = await Promise.all([
             AsyncStorage.getItem(SETTINGS_KEYS.SOUND_ENABLED),
             AsyncStorage.getItem(SETTINGS_KEYS.HAPTICS_ENABLED),
             AsyncStorage.getItem(SETTINGS_KEYS.COUNTDOWN_BEEPS),
+            AsyncStorage.getItem(SETTINGS_KEYS.AUTO_PLAY),
         ]);
 
         soundEnabled = sound !== 'false';
         hapticsEnabled = haptics !== 'false';
         countdownBeepsEnabled = countdown !== 'false';
+        autoPlayEnabled = autoPlay === 'true'; // Default is false, only true if explicitly set
         settingsLoaded = true;
     } catch (e) {
         console.error('Error loading feedback settings:', e);
@@ -58,13 +75,14 @@ export async function loadFeedbackSettings(): Promise<void> {
  * Save a feedback setting
  */
 export async function setFeedbackSetting(
-    key: 'sound' | 'haptics' | 'countdown',
+    key: 'sound' | 'haptics' | 'countdown' | 'autoplay',
     value: boolean
 ): Promise<void> {
     const storageKey = {
         sound: SETTINGS_KEYS.SOUND_ENABLED,
         haptics: SETTINGS_KEYS.HAPTICS_ENABLED,
         countdown: SETTINGS_KEYS.COUNTDOWN_BEEPS,
+        autoplay: SETTINGS_KEYS.AUTO_PLAY,
     }[key];
 
     await AsyncStorage.setItem(storageKey, value.toString());
@@ -72,6 +90,7 @@ export async function setFeedbackSetting(
     if (key === 'sound') soundEnabled = value;
     if (key === 'haptics') hapticsEnabled = value;
     if (key === 'countdown') countdownBeepsEnabled = value;
+    if (key === 'autoplay') autoPlayEnabled = value;
 }
 
 /**
@@ -82,6 +101,7 @@ export function getFeedbackSettings() {
         soundEnabled,
         hapticsEnabled,
         countdownBeepsEnabled,
+        autoPlayEnabled,
     };
 }
 
@@ -248,7 +268,7 @@ export async function playCompletionSound(): Promise<void> {
 /**
  * Called when exercise/step changes
  */
-export async function onStepTransition(): Promise<void> {
+export async function onStepTransition(nextExerciseName?: string): Promise<void> {
     await Promise.all([
         mediumTap(),
         playTransitionSound(),
@@ -258,7 +278,7 @@ export async function onStepTransition(): Promise<void> {
 /**
  * Called for countdown (3, 2, 1...)
  */
-export async function onCountdown(secondsLeft: number): Promise<void> {
+export async function onCountdown(secondsLeft: number, nextExerciseName?: string): Promise<void> {
     if (secondsLeft <= 3 && secondsLeft > 0) {
         await playCountdownBeep(secondsLeft);
     } else if (secondsLeft === 0) {
@@ -269,19 +289,15 @@ export async function onCountdown(secondsLeft: number): Promise<void> {
 /**
  * Called when a block/round completes
  */
-export async function onBlockComplete(): Promise<void> {
-    await Promise.all([
-        heavyTap(),
-    ]);
+export async function onBlockComplete(nextBlockName?: string): Promise<void> {
+    await heavyTap();
 }
 
 /**
  * Called when entire workout completes
  */
 export async function onWorkoutComplete(): Promise<void> {
-    await Promise.all([
-        playCompletionSound(),
-    ]);
+    await playCompletionSound();
 }
 
 /**

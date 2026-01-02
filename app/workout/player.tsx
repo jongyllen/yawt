@@ -62,6 +62,9 @@ export default function WorkoutPlayer() {
 
     const player = useWorkoutPlayer({
         workout,
+        workoutId: workoutId as string,
+        programId: programId as string,
+        programName: program?.name,
         initialIndexes,
     });
 
