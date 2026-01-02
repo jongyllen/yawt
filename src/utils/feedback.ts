@@ -1,6 +1,21 @@
 import * as Haptics from 'expo-haptics';
-import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+
+const getAudio = () => {
+    // Silently skip in Expo Go on Android to avoid warnings/errors
+    if (Platform.OS === 'android' && Constants.executionEnvironment === 'storeClient') {
+        return null;
+    }
+
+    try {
+        return require('expo-av').Audio;
+    } catch (e) {
+        return null;
+    }
+};
 
 // Settings keys
 const SETTINGS_KEYS = {
@@ -15,9 +30,9 @@ let hapticsEnabled = true;
 let countdownBeepsEnabled = true;
 let settingsLoaded = false;
 
-// Sound instances
-let beepSound: Audio.Sound | null = null;
-let completionSound: Audio.Sound | null = null;
+// Sound instances (using lazy type)
+let beepSound: any = null;
+let completionSound: any = null;
 
 /**
  * Load feedback settings from storage
@@ -78,13 +93,16 @@ export async function initAudio(): Promise<void> {
         await loadFeedbackSettings();
     }
 
+    const Audio = getAudio();
+    if (!Audio) return;
+
     try {
         await Audio.setAudioModeAsync({
             playsInSilentModeIOS: true,
             staysActiveInBackground: true,
         });
     } catch (e) {
-        console.error('Error initializing audio:', e);
+        console.warn('[Feedback] Error initializing audio:', e);
     }
 }
 
@@ -93,16 +111,16 @@ export async function initAudio(): Promise<void> {
  */
 export async function cleanupAudio(): Promise<void> {
     try {
-        if (beepSound) {
+        if (beepSound && typeof beepSound.unloadAsync === 'function') {
             await beepSound.unloadAsync();
             beepSound = null;
         }
-        if (completionSound) {
+        if (completionSound && typeof completionSound.unloadAsync === 'function') {
             await completionSound.unloadAsync();
             completionSound = null;
         }
     } catch (e) {
-        console.error('Error cleaning up audio:', e);
+        console.warn('[Feedback] Error cleaning up audio:', e);
     }
 }
 

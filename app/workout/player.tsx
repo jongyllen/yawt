@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
 import { Program, Workout } from '../../src/schemas/schema';
 import { getProgramById, initDatabase, saveWorkoutLog, getActiveProgramByProgramId, updateActiveProgram, startProgram } from '../../src/db/database';
+import * as CloudSync from '../../src/utils/cloudSync';
 import { X, Play, Pause, SkipForward, SkipBack, Check } from 'lucide-react-native';
 import { useWorkoutPlayer } from '../../src/hooks/useWorkoutPlayer';
 import * as Feedback from '../../src/utils/feedback';
@@ -12,6 +14,7 @@ import * as Health from '../../src/utils/health';
 export default function WorkoutPlayer() {
     const { programId, workoutId, weekNumber, dayNumber } = useLocalSearchParams();
     const router = useRouter();
+    const insets = useSafeAreaInsets();
 
     const [program, setProgram] = useState<Program | null>(null);
     const [workout, setWorkout] = useState<Workout | null>(null);
@@ -21,32 +24,40 @@ export default function WorkoutPlayer() {
 
     const finishWorkout = useCallback(async () => {
         if (!workout) return;
-        const endTime = new Date().toISOString();
-        const durationSeconds = Math.round((new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000);
+        try {
+            const endTime = new Date().toISOString();
+            const durationSeconds = Math.round((new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000);
 
-        const db = await initDatabase();
-        await saveWorkoutLog(db, {
-            id: Math.random().toString(36).substring(7),
-            workoutId: workoutId as string,
-            programId: programId as string,
-            workoutName: workout.name,
-            programName: program?.name,
-            date: endTime,
-            durationSeconds: durationSeconds,
-            completedSteps: [],
-            weekNumber: weekNumber ? parseInt(weekNumber as string) : undefined,
-            dayNumber: dayNumber ? parseInt(dayNumber as string) : undefined,
-        });
+            const db = await initDatabase();
+            await saveWorkoutLog(db, {
+                id: Math.random().toString(36).substring(7),
+                workoutId: workoutId as string,
+                programId: programId as string,
+                workoutName: workout.name,
+                programName: program?.name,
+                date: endTime,
+                durationSeconds: durationSeconds,
+                completedSteps: [],
+                weekNumber: weekNumber ? parseInt(weekNumber as string) : undefined,
+                dayNumber: dayNumber ? parseInt(dayNumber as string) : undefined,
+            });
 
-        // Sync to Apple Health
-        await Health.saveWorkoutToHealth({
-            startDate: startTime,
-            endDate: endTime,
-            durationSeconds,
-            workoutName: workout.name
-        });
+            // Sync to Apple Health (iOS only, guarded inside)
+            await Health.saveWorkoutToHealth({
+                startDate: startTime,
+                endDate: endTime,
+                durationSeconds,
+                workoutName: workout.name
+            });
 
-        router.replace('/(tabs)');
+            // Trigger cloud sync if enabled
+            await CloudSync.uploadToCloud();
+
+            router.replace('/(tabs)');
+        } catch (e) {
+            console.error('Error finishing workout:', e);
+            Alert.alert('Save Failed', 'There was an error saving your workout. Please try again.');
+        }
     }, [workout, program, workoutId, programId, weekNumber, dayNumber, router, startTime]);
 
     const player = useWorkoutPlayer({
@@ -145,40 +156,44 @@ export default function WorkoutPlayer() {
 
     if (player.isFinished) {
         return (
-            <SafeAreaView style={styles.container}>
+            <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
                 <View style={styles.header}>
                     <View style={{ width: 28 }} />
                     <Text style={Typography.h3}>Summary</Text>
                     <View style={{ width: 28 }} />
                 </View>
                 <View style={styles.mainContent}>
-                    <View style={styles.completionIconContainer}>
-                        <Check color={Colors.primary} size={60} />
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                        <View style={styles.completionIconContainer}>
+                            <Check color={Colors.primary} size={60} />
+                        </View>
+                        <Text style={[Typography.h1, { marginTop: Spacing.xl, textAlign: 'center' }]}>Workout Complete!</Text>
+                        <Text style={[Typography.bodySecondary, { marginTop: Spacing.sm, textAlign: 'center' }]}>
+                            You crushed {workout.name}
+                        </Text>
                     </View>
-                    <Text style={[Typography.h1, { marginTop: Spacing.xl, textAlign: 'center' }]}>Workout Complete!</Text>
-                    <Text style={[Typography.bodySecondary, { marginTop: Spacing.sm, textAlign: 'center' }]}>
-                        You crushed {workout.name}
-                    </Text>
 
                     <TouchableOpacity
                         style={styles.finishButton}
                         onPress={finishWorkout}
+                        activeOpacity={0.7}
                     >
                         <Text style={styles.finishButtonText}>FINISH & SAVE</Text>
                     </TouchableOpacity>
                 </View>
-            </SafeAreaView>
+            </View>
         );
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={handleAbort}>
+                <TouchableOpacity onPress={handleAbort} style={styles.headerButton}>
                     <X color={Colors.text} size={28} />
                 </TouchableOpacity>
                 <Text style={Typography.h3}>{workout.name}</Text>
                 <TouchableOpacity
+                    style={styles.headerButton}
                     onPress={() => {
                         if (player.isLastStep) {
                             player.handleNext();
@@ -283,7 +298,7 @@ export default function WorkoutPlayer() {
                     {player.timeLeft === null ? <Check color={Colors.success} size={40} /> : <SkipForward color={Colors.text} size={32} />}
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -296,7 +311,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: Spacing.lg,
+        paddingHorizontal: Spacing.lg,
+        paddingBottom: Spacing.md,
+        height: 60,
+    },
+    headerButton: {
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     progressContainer: {
         paddingHorizontal: Spacing.lg,
@@ -345,8 +368,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: Spacing.xxl,
-        paddingBottom: 100,
         paddingHorizontal: Spacing.lg,
     },
     timerText: {

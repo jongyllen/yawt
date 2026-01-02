@@ -3,20 +3,27 @@ import { Program, ProgramSchema, WorkoutLog, ActiveProgram, ActiveProgramSchema,
 
 const DB_NAME = 'yawt.db';
 let dbInstance: SQLite.SQLiteDatabase | null = null;
+let initPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 export const initDatabase = async () => {
     if (dbInstance) return dbInstance;
-    const db = await SQLite.openDatabaseAsync(DB_NAME);
-    dbInstance = db;
+    if (initPromise) return initPromise;
 
-    await db.execAsync(`
-    PRAGMA journal_mode = WAL;
+    initPromise = (async () => {
+        const db = await SQLite.openDatabaseAsync(DB_NAME);
+        dbInstance = db;
+
+        await db.execAsync('PRAGMA journal_mode = WAL;');
+
+        await db.execAsync(`
     CREATE TABLE IF NOT EXISTS programs (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+    );`);
+
+        await db.execAsync(`
     CREATE TABLE IF NOT EXISTS workout_logs (
       id TEXT PRIMARY KEY,
       workout_id TEXT NOT NULL,
@@ -25,33 +32,36 @@ export const initDatabase = async () => {
       duration_seconds INTEGER NOT NULL,
       data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+    );`);
+
+        await db.execAsync(`
     CREATE TABLE IF NOT EXISTS active_programs (
       id TEXT PRIMARY KEY,
       program_id TEXT NOT NULL,
       status TEXT NOT NULL,
       data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
+    );`);
 
-    // Migrations: Add week_number and day_number to workout_logs if they don't exist
-    try {
-        await db.execAsync('ALTER TABLE workout_logs ADD COLUMN week_number INTEGER;');
-    } catch (e) {
-        // Column might already exist
-    }
-    try {
-        await db.execAsync('ALTER TABLE workout_logs ADD COLUMN day_number INTEGER;');
-    } catch (e) {
-        // Column might already exist
-    }
-    try {
-        await db.execAsync('ALTER TABLE active_programs ADD COLUMN updated_at DATETIME;');
-    } catch (e) {
-        // Column might already exist
-    }
-    return db;
+        // Migrations: Add columns individually
+        const migrations = [
+            'ALTER TABLE workout_logs ADD COLUMN week_number INTEGER;',
+            'ALTER TABLE workout_logs ADD COLUMN day_number INTEGER;',
+            'ALTER TABLE active_programs ADD COLUMN updated_at DATETIME;'
+        ];
+
+        for (const sql of migrations) {
+            try {
+                await db.execAsync(sql);
+            } catch (e) {
+                // Column likely already exists
+            }
+        }
+
+        return db;
+    })();
+
+    return initPromise;
 };
 
 export const saveProgram = async (db: SQLite.SQLiteDatabase, program: Program) => {

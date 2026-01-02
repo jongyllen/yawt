@@ -13,6 +13,10 @@ import * as DocumentPicker from 'expo-document-picker';
 import { documentDirectory, writeAsStringAsync, readAsStringAsync } from 'expo-file-system/legacy';
 import { getFullBackup, restoreFullBackup } from '../../src/db/database';
 import * as Health from '../../src/utils/health';
+import * as Auth from '../../src/utils/auth';
+import * as CloudSync from '../../src/utils/cloudSync';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Cloud, CloudOff, RefreshCw, User, LogIn } from 'lucide-react-native';
 
 export default function SettingsScreen() {
     const router = useRouter();
@@ -27,6 +31,12 @@ export default function SettingsScreen() {
     // Feedback settings
     const [hapticsEnabled, setHapticsEnabled] = React.useState(true);
     const [countdownBeepsEnabled, setCountdownBeepsEnabled] = React.useState(true);
+
+    // Cloud Sync state
+    const [cloudSyncEnabled, setCloudSyncEnabled] = React.useState(false);
+    const [cloudUser, setCloudUser] = React.useState<Auth.CloudUser | null>(null);
+    const [isSyncing, setIsSyncing] = React.useState(false);
+    const [lastSyncTime, setLastSyncTime] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         loadSettings();
@@ -58,6 +68,25 @@ export default function SettingsScreen() {
         const feedbackSettings = Feedback.getFeedbackSettings();
         setHapticsEnabled(feedbackSettings.hapticsEnabled);
         setCountdownBeepsEnabled(feedbackSettings.countdownBeepsEnabled);
+
+        // Load Cloud Sync settings
+        const syncEnabled = await CloudSync.isCloudSyncEnabled();
+        setCloudSyncEnabled(syncEnabled);
+
+        const userId = await Auth.getStoredUserId();
+        if (userId) {
+            const name = await Auth.getStoredUserName();
+            const appleId = await Auth.getStoredUserId(); // Simple check for provider
+            setCloudUser({
+                id: userId,
+                fullName: name,
+                email: null,
+                provider: Platform.OS === 'ios' ? 'apple' : 'google'
+            });
+        }
+
+        const lastSync = await AsyncStorage.getItem('last_sync_time');
+        setLastSyncTime(lastSync);
     };
 
     const updateName = async (name: string) => {
@@ -76,13 +105,29 @@ export default function SettingsScreen() {
     };
 
     const toggleNotifications = async (value: boolean) => {
+        if (!Notifications.isNotificationAvailable()) {
+            Alert.alert(
+                'Not Supported',
+                'Notifications are not supported in Expo Go on Android SDK 53+. Please use a Development Client to enable this feature.'
+            );
+            return;
+        }
+
         if (value) {
             const granted = await Notifications.requestNotificationPermissions();
             if (!granted) {
-                Alert.alert('Permission Denied', 'Please enable notifications in your system settings.');
+                Alert.alert(
+                    'Permission Denied',
+                    'Notifications are disabled for this app. Please enable them in your system settings.',
+                    [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'System Settings', onPress: () => Notifications.openNotificationSettings() }
+                    ]
+                );
                 return;
             }
             await Notifications.scheduleDailyWorkoutReminder(reminderTime.getHours(), reminderTime.getMinutes());
+            Alert.alert('Reminder Set', `We will notify you daily at ${reminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
         } else {
             await Notifications.cancelAllReminders();
         }
@@ -226,6 +271,59 @@ export default function SettingsScreen() {
         } catch (e) {
             console.error('Restore error:', e);
             Alert.alert('Error', 'Failed to restore backup. Make sure it is a valid YAWT JSON file.');
+        }
+    };
+
+    const handleAppleSignIn = async () => {
+        try {
+            const user = await Auth.signInWithApple();
+            if (user) {
+                setCloudUser(user);
+                const enabled = await CloudSync.isCloudSyncEnabled();
+                setCloudSyncEnabled(enabled);
+            }
+        } catch (e) {
+            console.error('SiWA error:', e);
+            Alert.alert('Error', 'Failed to sign in with Apple.');
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            const user = await Auth.signInWithGoogle();
+            if (user) {
+                setCloudUser(user);
+                const enabled = await CloudSync.isCloudSyncEnabled();
+                setCloudSyncEnabled(enabled);
+            }
+        } catch (e) {
+            console.error('Google Sign-In error:', e);
+            Alert.alert('Error', 'Failed to sign in with Google.');
+        }
+    };
+
+    const toggleCloudSync = async (value: boolean) => {
+        if (value && !cloudUser) {
+            Alert.alert('Sign In Required', `Please sign in with ${Platform.OS === 'ios' ? 'Apple' : 'Google'} to enable Cloud Sync.`);
+            return;
+        }
+        setCloudSyncEnabled(value);
+        await CloudSync.setCloudSyncEnabled(value);
+
+        if (value) {
+            handleManualSync();
+        }
+    };
+
+    const handleManualSync = async () => {
+        setIsSyncing(true);
+        try {
+            await CloudSync.syncIfNewer();
+            await CloudSync.uploadToCloud();
+            const lastSync = await AsyncStorage.getItem('last_sync_time');
+            setLastSyncTime(lastSync);
+        } finally {
+            setIsSyncing(false);
         }
     };
 
@@ -410,15 +508,96 @@ export default function SettingsScreen() {
             </View>
 
             <View style={styles.section}>
-                <Text style={Typography.h3}>Backup & Sync</Text>
-                <TouchableOpacity style={styles.item} onPress={handleExport}>
-                    <Text style={Typography.body}>Export Backup</Text>
-                    <Text style={Typography.caption}>Save your progress and programs to a file</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.item} onPress={handleRestore}>
-                    <Text style={Typography.body}>Restore Backup</Text>
-                    <Text style={Typography.caption}>Load progress from a previously saved file</Text>
-                </TouchableOpacity>
+                <View style={[styles.sectionHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                    <Text style={Typography.h3}>Cloud Sync</Text>
+                    {isSyncing && <RefreshCw size={16} color={Colors.primary} style={styles.spinning} />}
+                </View>
+
+                {cloudUser ? (
+                    <View style={styles.userCard}>
+                        <View style={styles.userIcon}>
+                            <User color={Colors.primary} size={24} />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={Typography.body}>{cloudUser.fullName || 'User'}</Text>
+                            <Text style={Typography.caption}>Signed in with {cloudUser.provider === 'apple' ? 'Apple' : 'Google'}</Text>
+                        </View>
+                        <TouchableOpacity onPress={async () => {
+                            await Auth.signOut();
+                            setCloudUser(null);
+                            setCloudSyncEnabled(false);
+                            await CloudSync.setCloudSyncEnabled(false);
+                        }}>
+                            <Text style={[Typography.caption, { color: Colors.error }]}>Sign Out</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.signInContainer}>
+                        {Platform.OS === 'ios' ? (
+                            <AppleAuthentication.AppleAuthenticationButton
+                                buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                                cornerRadius={8}
+                                style={{ width: '100%', height: 44 }}
+                                onPress={handleAppleSignIn}
+                            />
+                        ) : (
+                            <View style={{ width: '100%' }}>
+                                <TouchableOpacity
+                                    style={[styles.googleButton, !Auth.isGoogleAuthAvailable() && { opacity: 0.5 }]}
+                                    onPress={handleGoogleSignIn}
+                                    disabled={!Auth.isGoogleAuthAvailable()}
+                                >
+                                    <LogIn size={20} color={Colors.background} />
+                                    <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                                </TouchableOpacity>
+                                {!Auth.isGoogleAuthAvailable() && (
+                                    <Text style={[Typography.caption, { color: Colors.warning, marginTop: Spacing.xs, textAlign: 'center' }]}>
+                                        Google Sign-In requires a Development Client (Not supported in Expo Go).
+                                    </Text>
+                                )}
+                            </View>
+                        )}
+                    </View>
+                )}
+
+                <View style={[styles.item, styles.rowItem]}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={Typography.body}>Automatic Cloud Sync</Text>
+                        <Text style={Typography.caption}>
+                            {lastSyncTime
+                                ? `Last synced: ${new Date(lastSyncTime).toLocaleString()}`
+                                : `Keep your data safe in ${Platform.OS === 'ios' ? 'iCloud' : 'Google Drive'}`}
+                        </Text>
+                    </View>
+                    <Switch
+                        value={cloudSyncEnabled}
+                        onValueChange={toggleCloudSync}
+                        trackColor={{ false: Colors.surface, true: Colors.primary }}
+                        thumbColor={Colors.text}
+                        disabled={!cloudUser}
+                    />
+                </View>
+
+                {!cloudSyncEnabled && (
+                    <>
+                        <TouchableOpacity style={styles.item} onPress={handleExport}>
+                            <Text style={Typography.body}>Export Backup</Text>
+                            <Text style={Typography.caption}>Save your progress to a file</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.item} onPress={handleRestore}>
+                            <Text style={Typography.body}>Restore Backup</Text>
+                            <Text style={Typography.caption}>Load progress from a file</Text>
+                        </TouchableOpacity>
+                    </>
+                )}
+
+                {cloudSyncEnabled && (
+                    <TouchableOpacity style={styles.item} onPress={handleManualSync} disabled={isSyncing}>
+                        <Text style={[Typography.body, { color: Colors.primary }]}>Sync Now</Text>
+                        <Text style={Typography.caption}>Force an immediate cloud update</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
             <View style={styles.section}>
@@ -445,6 +624,9 @@ const styles = StyleSheet.create({
     },
     section: {
         marginTop: Spacing.xl,
+    },
+    sectionHeader: {
+        marginBottom: Spacing.sm,
     },
     item: {
         paddingVertical: Spacing.md,
@@ -484,4 +666,43 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingVertical: Spacing.xs,
     },
+    userCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        padding: Spacing.md,
+        borderRadius: 12,
+        marginTop: Spacing.md,
+        gap: Spacing.md,
+        borderWidth: 1,
+        borderColor: Colors.border,
+    },
+    userIcon: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: `${Colors.primary}15`,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    googleButton: {
+        backgroundColor: Colors.text,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 44,
+        borderRadius: 8,
+        gap: Spacing.sm,
+    },
+    googleButtonText: {
+        color: Colors.background,
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    signInContainer: {
+        marginTop: Spacing.md,
+    },
+    spinning: {
+        // In a real app we'd use animated API here, but for now just the icon
+    }
 });

@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -17,7 +16,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yawt.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "usesAppleSignIn": true
       }
     },
     "android": {
@@ -55,7 +55,16 @@
           "healthSharePermission": "YAWT uses your health data to sync your workout history.",
           "healthUpdatePermission": "YAWT saves your completed workouts to help you close your activity rings."
         }
-      ]
+      ],
+      "expo-apple-authentication",
+      "expo-secure-store",
+      [
+        "react-native-cloud-storage",
+        {
+          "iCloudContainerIdentifier": "iCloud.com.yawt.app"
+        }
+      ],
+      "@react-native-google-signin/google-signin"
     ],
     "extra": {
       "router": {},

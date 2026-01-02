@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Program, Workout, WorkoutLog } from '../../src/schemas/schema';
 import { calculateStreak, workedOutToday } from '../../src/utils/streak';
 import { saveWidgetData } from '../../src/utils/widgetData';
+import * as CloudSync from '../../src/utils/cloudSync';
 
 export default function TodayScreen() {
     const router = useRouter();
@@ -61,6 +62,9 @@ export default function TodayScreen() {
             workedOutToday: workedOutToday(workoutLogs),
             lastUpdated: new Date().toISOString(),
         });
+
+        // Sync with cloud if enabled
+        await CloudSync.syncIfNewer();
     }, []);
 
     useFocusEffect(

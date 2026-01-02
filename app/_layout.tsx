@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { initDatabase } from '../src/db/database';
 import { Colors } from '../src/constants/theme';
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 export default function RootLayout() {
     useEffect(() => {
         // Initialize database on app start
@@ -12,27 +14,29 @@ export default function RootLayout() {
     }, []);
 
     return (
-        <ThemeProvider value={DarkTheme}>
-            <Stack
-                screenOptions={{
-                    headerStyle: {
-                        backgroundColor: Colors.background,
-                    },
-                    headerTintColor: Colors.primary,
-                    headerTitleStyle: {
-                        fontWeight: 'bold',
-                    },
-                    contentStyle: {
-                        backgroundColor: Colors.background,
-                    },
-                    headerBackTitle: 'Back',
-                }}
-            >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="workout/player" options={{ presentation: 'fullScreenModal', headerShown: false }} />
-                <Stack.Screen name="import" options={{ presentation: 'modal', title: 'Import Program' }} />
-            </Stack>
-            <StatusBar style="light" />
-        </ThemeProvider>
+        <SafeAreaProvider>
+            <ThemeProvider value={DarkTheme}>
+                <Stack
+                    screenOptions={{
+                        headerStyle: {
+                            backgroundColor: Colors.background,
+                        },
+                        headerTintColor: Colors.primary,
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
+                        contentStyle: {
+                            backgroundColor: Colors.background,
+                        },
+                        headerBackTitle: 'Back',
+                    }}
+                >
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen name="workout/player" options={{ presentation: 'fullScreenModal', headerShown: false }} />
+                    <Stack.Screen name="import" options={{ presentation: 'modal', title: 'Import Program' }} />
+                </Stack>
+                <StatusBar style="light" />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
