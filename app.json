@@ -21,9 +21,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "usesAppleSignIn": true,
         "NSSupportsLiveActivities": true,
-        "UIBackgroundModes": [
-          "audio"
-        ]
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {

@@ -1,5 +1,5 @@
 export const generateAIPrompt = (userDescription: string) => {
-    return `Create a fitness program JSON based on the following description: "${userDescription}"
+  return `Create a fitness program JSON based on the following description: "${userDescription}"
 
 The JSON must follow this exact structure:
 {

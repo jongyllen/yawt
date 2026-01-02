@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+/**
+ * Media associated with an exercise (image or video).
+ */
 export const ExerciseMediaSchema = z.object({
   id: z.string(),
   type: z.enum(['image', 'video']),
@@ -9,6 +12,10 @@ export const ExerciseMediaSchema = z.object({
 
 export type ExerciseMedia = z.infer<typeof ExerciseMediaSchema>;
 
+/**
+ * A single step within a workout block.
+ * Can be an exercise, rest period, timer, or isometric hold.
+ */
 export const StepSchema = z.object({
   id: z.string(),
   type: z.enum(['exercise_ref', 'exercise_inline', 'rest', 'timer', 'hold']),
@@ -25,6 +32,10 @@ export const StepSchema = z.object({
 
 export type Step = z.infer<typeof StepSchema>;
 
+/**
+ * A group of steps (e.g., Warmup, Main Set, Circuit).
+ * Supports multiple rounds and rest between rounds.
+ */
 export const BlockSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -36,6 +47,9 @@ export const BlockSchema = z.object({
 
 export type Block = z.infer<typeof BlockSchema>;
 
+/**
+ * A standalone workout consisting of multiple blocks.
+ */
 export const WorkoutSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -45,28 +59,36 @@ export const WorkoutSchema = z.object({
 
 export type Workout = z.infer<typeof WorkoutSchema>;
 
+/**
+ * A structured program containing multiple workouts, optionally organized by weeks/days.
+ */
 export const ProgramSchema = z.object({
   id: z.string(),
   version: z.literal('workout.program.v1'),
   name: z.string(),
   description: z.string().optional(),
   author: z.string().optional(),
-  weeks: z.array(
-    z.object({
-      weekNumber: z.number(),
-      workouts: z.array(
-        z.object({
-          dayNumber: z.number(),
-          workoutId: z.string(),
-        })
-      ),
-    })
-  ).optional(),
+  weeks: z
+    .array(
+      z.object({
+        weekNumber: z.number(),
+        workouts: z.array(
+          z.object({
+            dayNumber: z.number(),
+            workoutId: z.string(),
+          })
+        ),
+      })
+    )
+    .optional(),
   workouts: z.array(WorkoutSchema),
 });
 
 export type Program = z.infer<typeof ProgramSchema>;
 
+/**
+ * A record of a completed or partially completed workout.
+ */
 export const WorkoutLogSchema = z.object({
   id: z.string(),
   workoutId: z.string(),
@@ -82,8 +104,11 @@ export const WorkoutLogSchema = z.object({
 
 export type WorkoutLog = z.infer<typeof WorkoutLogSchema>;
 
+/**
+ * Represents a user's enrollment/progress in a specific program.
+ */
 export const ActiveProgramSchema = z.object({
-  id: z.string(), // enrollment ID
+  id: z.string(), // unique enrollment ID
   programId: z.string(),
   startDate: z.string(),
   status: z.enum(['active', 'completed', 'paused']),

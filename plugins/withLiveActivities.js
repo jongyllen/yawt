@@ -1,9 +1,9 @@
 /**
  * Expo Config Plugin for Live Activities
- * 
+ *
  * This plugin configures iOS Live Activities and Dynamic Island support.
  * It adds necessary entitlements and Info.plist entries.
- * 
+ *
  * Note: The Widget Extension must be added manually in Xcode:
  * 1. Open the .xcworkspace in Xcode
  * 2. File > New > Target > Widget Extension
@@ -55,10 +55,10 @@ const withLiveActivitiesNativeFiles = (config) => {
       { src: 'LiveActivityModule.swift', dest: projectName },
       { src: 'LiveActivityModule.m', dest: projectName },
       { src: 'WorkoutLiveActivity/WorkoutLiveActivityWidget.swift', dest: 'WorkoutLiveActivity' },
-      { src: 'WorkoutLiveActivity/Info.plist', dest: 'WorkoutLiveActivity' }
+      { src: 'WorkoutLiveActivity/Info.plist', dest: 'WorkoutLiveActivity' },
     ];
 
-    filesToCopy.forEach(file => {
+    filesToCopy.forEach((file) => {
       const destDir = path.join(iosRoot, file.dest);
       if (!fs.existsSync(destDir)) {
         fs.mkdirSync(destDir, { recursive: true });
@@ -84,4 +84,3 @@ const withLiveActivities = (config) => {
 };
 
 module.exports = withLiveActivities;
-

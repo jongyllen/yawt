@@ -11,56 +11,62 @@ import { clearBadge, requestNotificationPermissions } from '../src/utils/notific
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
-    useEffect(() => {
-        // Initialize database on app start
-        initDatabase().catch(console.error);
+  useEffect(() => {
+    // Initialize database on app start
+    initDatabase().catch(console.error);
 
-        // Clean up any stale Live Activities from previous sessions
-        endAllLiveActivities().catch(console.error);
+    // Clean up any stale Live Activities from previous sessions
+    endAllLiveActivities().catch(console.error);
 
-        // AppState listener to clear badge when app comes to foreground
-        const handleAppStateChange = (nextAppState: AppStateStatus) => {
-            if (nextAppState === 'active') {
-                clearBadge();
-            }
-        };
+    // AppState listener to clear badge when app comes to foreground
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        clearBadge();
+      }
+    };
 
-        // Initial permission request and badge clear
-        requestNotificationPermissions().then(() => {
-            clearBadge();
-        });
+    // Initial permission request and badge clear
+    requestNotificationPermissions().then(() => {
+      clearBadge();
+    });
 
-        const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
 
-        return () => {
-            subscription.remove();
-        };
-    }, []);
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
-    return (
-        <SafeAreaProvider>
-            <ThemeProvider value={DarkTheme}>
-                <Stack
-                    screenOptions={{
-                        headerStyle: {
-                            backgroundColor: Colors.background,
-                        },
-                        headerTintColor: Colors.primary,
-                        headerTitleStyle: {
-                            fontWeight: 'bold',
-                        },
-                        contentStyle: {
-                            backgroundColor: Colors.background,
-                        },
-                        headerBackTitle: 'Back',
-                    }}
-                >
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen name="workout/player" options={{ presentation: 'fullScreenModal', headerShown: false }} />
-                    <Stack.Screen name="import" options={{ presentation: 'modal', title: 'Import Program' }} />
-                </Stack>
-                <StatusBar style="light" />
-            </ThemeProvider>
-        </SafeAreaProvider>
-    );
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider value={DarkTheme}>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: Colors.background,
+            },
+            headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            contentStyle: {
+              backgroundColor: Colors.background,
+            },
+            headerBackTitle: 'Back',
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="workout/player"
+            options={{ presentation: 'fullScreenModal', headerShown: false }}
+          />
+          <Stack.Screen
+            name="import"
+            options={{ presentation: 'modal', title: 'Import Program' }}
+          />
+        </Stack>
+        <StatusBar style="light" />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
 }

@@ -26,6 +26,7 @@ To host your own programs on GitHub:
 1. **Create a public repository** on GitHub
 
 2. **Add a `registry.json`** file at the root with this structure:
+
    ```json
    {
      "programs": [
@@ -120,12 +121,14 @@ See the [yawt-workouts repository](https://github.com/jongyllen/yawt-workouts) f
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/jongyllen/yawt.git
    cd yawt
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```

@@ -1,0 +1,139 @@
+import { StyleSheet } from 'react-native';
+import { Colors, Spacing } from '../../constants/theme';
+
+export const dashboardStyles = StyleSheet.create({
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 20,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  streakBadgeActive: {
+    borderColor: Colors.warning,
+    backgroundColor: `${Colors.warning}15`,
+  },
+  streakNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.textTertiary,
+  },
+  streakNumberActive: {
+    color: Colors.warning,
+  },
+  streakCard: {
+    marginTop: Spacing.md,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: `${Colors.warning}40`,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.warning,
+  },
+  streakMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  streakInfo: {
+    flex: 1,
+  },
+  streakLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  streakValue: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: Colors.warning,
+  },
+  streakMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  completedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  completedText: {
+    fontSize: 12,
+    color: Colors.success,
+    fontWeight: '600',
+  },
+  keepGoingText: {
+    fontSize: 12,
+    color: Colors.secondary,
+    fontWeight: '600',
+  },
+  bestText: {
+    fontSize: 12,
+    color: Colors.textTertiary,
+  },
+  section: {
+    marginTop: Spacing.xl,
+  },
+  heroCard: {
+    backgroundColor: Colors.primary,
+    borderRadius: 20,
+    padding: Spacing.lg,
+    minHeight: 180,
+    justifyContent: 'center',
+  },
+  heroContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    alignSelf: 'flex-start',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: 99,
+    marginTop: Spacing.lg,
+  },
+  startText: {
+    fontWeight: '800',
+    fontSize: 14,
+    color: Colors.primary,
+    marginLeft: Spacing.sm,
+  },
+  emptyHero: {
+    marginTop: Spacing.xl,
+    padding: Spacing.xxl,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  logCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    padding: Spacing.md,
+    borderRadius: 12,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+});
