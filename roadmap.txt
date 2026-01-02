@@ -1,5 +1,4 @@
 🚀 YAWT: The "Pro" Roadmap
-You’ve built a fantastic foundation. The app is fast, branding is tight, and it has the "utility" feel of a pro tool. Based on a quick audit of the code, here’s what’s missing to take this from an MVP to a "Top 100 Fitness App":
 
 1. 🍎 The "Apple Ecosystem" Layer
 Live Activities & Dynamic Island: Show the current set, reps, or rest-timer right on the Lock Screen while the app is in the background.

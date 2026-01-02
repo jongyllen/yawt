@@ -15,6 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yawt.app",
+      "usesIcloudStorage": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "usesAppleSignIn": true
@@ -35,20 +36,6 @@
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      [
-        "react-native-android-widget",
-        {
-          "widgets": [
-            {
-              "name": "StreakWidget",
-              "label": "Streak Widget",
-              "description": "Show your workout streak",
-              "src": "./src/widgets/StreakWidget.tsx"
-            }
-          ]
-        }
-      ],
-      "./plugins/withStreakWidget",
       [
         "react-native-health",
         {
