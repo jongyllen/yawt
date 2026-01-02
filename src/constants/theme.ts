@@ -39,6 +39,12 @@ export const Typography = {
     fontWeight: '600' as const,
     color: Colors.text,
   },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: 'bold' as const,
+    color: Colors.text,
+    letterSpacing: 0.5,
+  },
   body: {
     fontSize: 16,
     color: Colors.text,

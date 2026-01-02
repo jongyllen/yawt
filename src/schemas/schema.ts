@@ -54,6 +54,7 @@ export const WorkoutSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  muscleGroups: z.array(z.string()).optional(),
   blocks: z.array(BlockSchema),
 });
 
@@ -87,6 +88,21 @@ export const ProgramSchema = z.object({
 export type Program = z.infer<typeof ProgramSchema>;
 
 /**
+ * A record of a single completed step.
+ */
+export const StepResultSchema = z.object({
+  stepId: z.string(),
+  exerciseId: z.string().optional(),
+  name: z.string().optional(),
+  reps: z.number().optional(),
+  weight: z.number().optional(),
+  durationSeconds: z.number().optional(),
+  completed: z.boolean().default(false),
+});
+
+export type StepResult = z.infer<typeof StepResultSchema>;
+
+/**
  * A record of a completed or partially completed workout.
  */
 export const WorkoutLogSchema = z.object({
@@ -97,12 +113,30 @@ export const WorkoutLogSchema = z.object({
   programName: z.string().optional(),
   date: z.string(), // ISO String
   durationSeconds: z.number(),
-  completedSteps: z.array(z.string()), // IDs of completed steps
+  completedSteps: z.array(z.string()), // IDs of completed steps (legacy)
+  stepResults: z.array(StepResultSchema).optional(), // Detailed findings
+  muscleGroups: z.array(z.string()).optional(),
   weekNumber: z.number().optional(),
   dayNumber: z.number().optional(),
 });
 
 export type WorkoutLog = z.infer<typeof WorkoutLogSchema>;
+
+/**
+ * A Personal Record (PR) tracker.
+ */
+export const PersonalRecordSchema = z.object({
+  id: z.string(),
+  exerciseId: z.string(), // Normalized exercise ID or Name
+  exerciseName: z.string(),
+  type: z.enum(['weight', 'reps', 'duration', 'volume']),
+  value: z.number(),
+  date: z.string(),
+  workoutId: z.string().optional(),
+  workoutName: z.string().optional(),
+});
+
+export type PersonalRecord = z.infer<typeof PersonalRecordSchema>;
 
 /**
  * Represents a user's enrollment/progress in a specific program.

@@ -155,7 +155,7 @@ export async function lightTap(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -165,7 +165,7 @@ export async function mediumTap(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -175,7 +175,7 @@ export async function heavyTap(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -185,7 +185,7 @@ export async function successHaptic(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -195,7 +195,7 @@ export async function warningHaptic(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -205,11 +205,24 @@ export async function completionBurst(): Promise<void> {
   if (!hapticsEnabled) return;
   try {
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await new Promise((r) => setTimeout(r, 150));
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    await new Promise((r) => setTimeout(r, 150));
+  } catch (e) { }
+}
+
+/**
+ * Gold Medal PR celebration - a distinct, high-energy haptic pattern
+ */
+export async function goldMedalHaptic(): Promise<void> {
+  if (!hapticsEnabled) return;
+  try {
+    // A rhythmic triple burst
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  } catch (e) {}
+    await new Promise((r) => setTimeout(r, 100));
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    await new Promise((r) => setTimeout(r, 100));
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    await new Promise((r) => setTimeout(r, 100));
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  } catch (e) { }
 }
 
 // ============================================
@@ -236,7 +249,7 @@ export async function playCountdownBeep(count: number): Promise<void> {
       // Final beep - double tap
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -247,7 +260,7 @@ export async function playTransitionSound(): Promise<void> {
 
   try {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -258,7 +271,7 @@ export async function playCompletionSound(): Promise<void> {
 
   try {
     await completionBurst();
-  } catch (e) {}
+  } catch (e) { }
 }
 
 // ============================================

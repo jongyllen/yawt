@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { Workout } from '../schemas/schema';
+import { Workout, StepResult } from '../schemas/schema';
 import * as Feedback from '../utils/feedback';
 import * as LiveActivity from '../utils/liveActivity';
 import * as WorkoutPersistence from '../utils/workoutPersistence';
@@ -42,6 +42,11 @@ export function useWorkoutPlayer({
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [stepResults, setStepResults] = useState<StepResult[]>([]);
+
+  // Performance adjustments for current step
+  const [adjustedReps, setAdjustedReps] = useState<number | undefined>(undefined);
+  const [adjustedWeight, setAdjustedWeight] = useState<number | undefined>(undefined);
 
   // Refs for persistence and timers
   const persistedStateRef = useRef<WorkoutPersistence.PersistedWorkoutState | null>(null);
@@ -243,7 +248,19 @@ export function useWorkoutPlayer({
 
       clearTimer();
       const block = workout.blocks[currentBlockIndex];
+      const step = block.steps[currentStepIndex];
       const nextExercise = getNextExerciseName();
+
+      // Record performance for completed step
+      const result: StepResult = {
+        stepId: step.id,
+        exerciseId: step.exerciseId,
+        name: step.name,
+        reps: adjustedReps ?? step.reps,
+        weight: adjustedWeight ?? step.weight,
+        durationSeconds: step.durationSeconds,
+        completed: true,
+      };
 
       let newBlockIndex = currentBlockIndex;
       let newStepIndex = currentStepIndex;
@@ -280,7 +297,8 @@ export function useWorkoutPlayer({
         persistedStateRef.current,
         newBlockIndex,
         newStepIndex,
-        newRound
+        newRound,
+        result
       );
 
       // If explicitly requested or manually triggered, we check pause state
@@ -301,6 +319,11 @@ export function useWorkoutPlayer({
       const nextStep = workout.blocks[newBlockIndex].steps[newStepIndex];
       const nextDuration = nextStep?.durationSeconds;
       setTimeLeft(nextDuration || null);
+
+      // Reset adjustment state for next step
+      setAdjustedReps(undefined);
+      setAdjustedWeight(undefined);
+      setStepResults(newState.stepResults);
 
       hasCompletedRef.current = false;
     },
@@ -411,6 +434,7 @@ export function useWorkoutPlayer({
         initialIndexes
       );
       await saveState(initialState);
+      setStepResults(initialState.stepResults);
 
       // Start Live Activity
       const state = LiveActivity.formatStepDescription(currentStep || {});
@@ -625,5 +649,12 @@ export function useWorkoutPlayer({
     isLastStep: getIsLastStep(),
     currentBlock,
     currentStep,
+    stepResults,
+    adjustedReps,
+    adjustedWeight,
+    updatePerformance: (reps?: number, weight?: number) => {
+      if (reps !== undefined) setAdjustedReps(reps);
+      if (weight !== undefined) setAdjustedWeight(weight);
+    },
   };
 }

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StepResult } from '../schemas/schema';
 
 const WORKOUT_STATE_KEY = 'active_workout_state';
 
@@ -28,6 +29,9 @@ export interface PersistedWorkoutState {
   workoutStartedAt: string; // ISO string when workout began
   isPaused: boolean;
   isFinished: boolean;
+
+  // Track performance
+  stepResults: StepResult[];
 }
 
 /**
@@ -133,6 +137,7 @@ export function createInitialWorkoutState(
     workoutStartedAt: new Date().toISOString(),
     isPaused: false,
     isFinished: false,
+    stepResults: [],
   };
 }
 
@@ -193,8 +198,14 @@ export function advanceStep(
   state: PersistedWorkoutState,
   newBlockIndex: number,
   newStepIndex: number,
-  newRound: number
+  newRound: number,
+  currentStepResult?: StepResult
 ): PersistedWorkoutState {
+  const nextResults = [...state.stepResults];
+  if (currentStepResult) {
+    nextResults.push(currentStepResult);
+  }
+
   return {
     ...state,
     blockIndex: newBlockIndex,
@@ -204,6 +215,7 @@ export function advanceStep(
     timerDuration: null,
     timerPausedAt: null,
     accumulatedPauseTime: 0,
+    stepResults: nextResults,
   };
 }
 

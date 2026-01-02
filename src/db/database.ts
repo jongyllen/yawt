@@ -6,6 +6,7 @@ import {
   ActiveProgram,
   ActiveProgramSchema,
   Workout,
+  PersonalRecord,
 } from '../schemas/schema';
 
 const DB_NAME = 'yawt.db';
@@ -37,6 +38,15 @@ const TABLES = [
       id TEXT PRIMARY KEY,
       program_id TEXT NOT NULL,
       status TEXT NOT NULL,
+      data TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );`,
+  `CREATE TABLE IF NOT EXISTS personal_records (
+      id TEXT PRIMARY KEY,
+      exercise_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      value REAL NOT NULL,
+      date TEXT NOT NULL,
       data TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );`,
@@ -261,6 +271,39 @@ export const getNextWorkoutForProgram = async (
   // Wrap around or finish? For now, let's just return null if finished,
   // or we could repeat the program. Let's return null to signify completion of the cycle.
   return null;
+};
+
+// PR Management
+export const savePersonalRecord = async (db: SQLite.SQLiteDatabase, pr: PersonalRecord) => {
+  await db.runAsync(
+    'INSERT OR REPLACE INTO personal_records (id, exercise_id, type, value, date, data) VALUES (?, ?, ?, ?, ?, ?)',
+    pr.id,
+    pr.exerciseId,
+    pr.type,
+    pr.value,
+    pr.date,
+    JSON.stringify(pr)
+  );
+};
+
+export const getPersonalRecords = async (db: SQLite.SQLiteDatabase): Promise<PersonalRecord[]> => {
+  const rows = await db.getAllAsync<{ data: string }>(
+    'SELECT data FROM personal_records ORDER BY date DESC'
+  );
+  return rows.map((row) => JSON.parse(row.data));
+};
+
+export const getBestForExercise = async (
+  db: SQLite.SQLiteDatabase,
+  exerciseId: string,
+  type: PersonalRecord['type']
+): Promise<PersonalRecord | null> => {
+  const row = await db.getFirstAsync<{ data: string }>(
+    'SELECT data FROM personal_records WHERE exercise_id = ? AND type = ? ORDER BY value DESC',
+    exerciseId,
+    type
+  );
+  return row ? JSON.parse(row.data) : null;
 };
 
 export const clearAllLogs = async (db: SQLite.SQLiteDatabase) => {

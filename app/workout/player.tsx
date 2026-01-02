@@ -13,10 +13,11 @@ import {
   startProgram,
 } from '../../src/db/database';
 import * as CloudSync from '../../src/utils/cloudSync';
-import { X, Play, Pause, SkipForward, SkipBack, Check } from 'lucide-react-native';
+import { X, Play, Pause, SkipForward, SkipBack, Check, Trophy, Plus, Minus } from 'lucide-react-native';
 import { useWorkoutPlayer } from '../../src/hooks/useWorkoutPlayer';
 import * as Feedback from '../../src/utils/feedback';
 import * as Health from '../../src/utils/health';
+import { checkAndSavePRs, NewPR } from '../../src/utils/prUtils';
 
 export default function WorkoutPlayer() {
   const { programId, workoutId, weekNumber, dayNumber } = useLocalSearchParams();
@@ -30,6 +31,13 @@ export default function WorkoutPlayer() {
   const [initialIndexes, setInitialIndexes] = useState<
     { blockIndex: number; stepIndex: number; round: number } | undefined
   >();
+  const [newPRs, setNewPRs] = useState<NewPR[]>([]);
+  const [summaryStats, setSummaryStats] = useState<{
+    duration: string;
+    totalReps: number;
+    volume: number;
+  } | null>(null);
+  const [prProcessed, setPrProcessed] = useState(false);
 
   const finishWorkout = useCallback(async () => {
     if (!workout) return;
@@ -40,7 +48,7 @@ export default function WorkoutPlayer() {
       );
 
       const db = await initDatabase();
-      await saveWorkoutLog(db, {
+      const log = {
         id: Math.random().toString(36).substring(7),
         workoutId: workoutId as string,
         programId: programId as string,
@@ -49,17 +57,11 @@ export default function WorkoutPlayer() {
         date: endTime,
         durationSeconds: durationSeconds,
         completedSteps: [],
+        stepResults: player.stepResults,
         weekNumber: weekNumber ? parseInt(weekNumber as string) : undefined,
         dayNumber: dayNumber ? parseInt(dayNumber as string) : undefined,
-      });
-
-      // Sync to Apple Health (iOS only, guarded inside)
-      await Health.saveWorkoutToHealth({
-        startDate: startTime,
-        endDate: endTime,
-        durationSeconds,
-        workoutName: workout.name,
-      });
+      };
+      await saveWorkoutLog(db, log);
 
       // Trigger cloud sync if enabled
       await CloudSync.uploadToCloud();
@@ -158,6 +160,59 @@ export default function WorkoutPlayer() {
 
   const [showInstructions, setShowInstructions] = useState(false);
 
+  // Handle workout completion logic (detect PRs, calc stats)
+  useEffect(() => {
+    if (player.isFinished && !prProcessed && workout) {
+      const runCompletion = async () => {
+        setPrProcessed(true);
+        const endTime = new Date().toISOString();
+        const durationSeconds = Math.round(
+          (new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000
+        );
+
+        // Calculate summary stats
+        const totalReps = player.stepResults.reduce((sum, r) => sum + (r.reps || 0), 0);
+        const volume = player.stepResults.reduce(
+          (sum, r) => sum + (r.reps || 0) * (r.weight || 0),
+          0
+        );
+        const minutes = Math.floor(durationSeconds / 60);
+        const seconds = durationSeconds % 60;
+
+        setSummaryStats({
+          duration: `${minutes}m ${seconds}s`,
+          totalReps,
+          volume,
+        });
+
+        const db = await initDatabase();
+        const log = {
+          id: 'temp-' + Date.now(),
+          workoutId: workoutId as string,
+          programId: programId as string,
+          workoutName: workout.name,
+          programName: program?.name,
+          date: endTime,
+          durationSeconds,
+          completedSteps: [],
+          stepResults: player.stepResults,
+        };
+
+        const detectedPRs = await checkAndSavePRs(db, log);
+        setNewPRs(detectedPRs);
+
+        // Trigger health save early so it's ready when they finish
+        Health.saveWorkoutToHealth({
+          startDate: startTime,
+          endDate: endTime,
+          durationSeconds,
+          workoutName: workout.name,
+        });
+      };
+      runCompletion();
+    }
+  }, [player.isFinished, prProcessed, workout, startTime, player.stepResults]);
+
   if (!workout || !player.currentBlock || !player.currentStep) {
     return (
       <View style={styles.container}>
@@ -187,6 +242,43 @@ export default function WorkoutPlayer() {
             >
               You crushed {workout.name}
             </Text>
+
+            {summaryStats && (
+              <View style={styles.statsSummaryGrid}>
+                <View style={styles.summaryStatItem}>
+                  <Text style={styles.summaryStatValue}>{summaryStats.duration}</Text>
+                  <Text style={styles.summaryStatLabel}>DURATION</Text>
+                </View>
+                <View style={styles.summaryStatItem}>
+                  <Text style={styles.summaryStatValue}>{summaryStats.totalReps}</Text>
+                  <Text style={styles.summaryStatLabel}>TOTAL REPS</Text>
+                </View>
+                {summaryStats.volume > 0 && (
+                  <View style={styles.summaryStatItem}>
+                    <Text style={styles.summaryStatValue}>{summaryStats.volume}kg</Text>
+                    <Text style={styles.summaryStatLabel}>VOLUME</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {newPRs.length > 0 && (
+              <View style={styles.prSummaryContainer}>
+                <View style={styles.prHeader}>
+                  <Trophy color={Colors.warning} size={20} />
+                  <Text style={styles.prHeaderText}>NEW RECORDS!</Text>
+                </View>
+                {newPRs.map((pr, i) => (
+                  <View key={i} style={styles.prRow}>
+                    <Text style={styles.prExerciseName}>{pr.exerciseName}</Text>
+                    <Text style={styles.prValue}>
+                      {pr.newValue}
+                      {pr.type === 'weight' ? 'kg' : pr.type === 'duration' ? 's' : ''} {pr.type}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           <TouchableOpacity style={styles.finishButton} onPress={finishWorkout} activeOpacity={0.7}>
@@ -270,11 +362,77 @@ export default function WorkoutPlayer() {
         )}
 
         {player.timeLeft !== null ? (
-          <Text style={styles.timerText}>{player.timeLeft}</Text>
+          <View style={styles.timerRow}>
+            <TouchableOpacity
+              onPress={() => player.updatePerformance(undefined, undefined)}
+              style={styles.adjustButton}
+            >
+              <Minus color={Colors.textTertiary} size={24} />
+            </TouchableOpacity>
+            <Text style={styles.timerText}>{player.timeLeft}</Text>
+            <TouchableOpacity
+              onPress={() => player.updatePerformance(undefined, undefined)}
+              style={styles.adjustButton}
+            >
+              <Plus color={Colors.textTertiary} size={24} />
+            </TouchableOpacity>
+          </View>
         ) : (
           <View style={styles.repContainer}>
-            <Text style={styles.repText}>{player.currentStep.reps ?? 'Hold'}</Text>
+            <View style={styles.repControlRow}>
+              <TouchableOpacity
+                onPress={() =>
+                  player.updatePerformance(
+                    Math.max(0, (player.adjustedReps ?? player.currentStep?.reps ?? 0) - 1)
+                  )
+                }
+                style={styles.adjustButton}
+              >
+                <Minus color={Colors.secondary} size={32} />
+              </TouchableOpacity>
+              <Text style={styles.repText}>{player.adjustedReps ?? player.currentStep?.reps ?? 'Hold'}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  player.updatePerformance(
+                    (player.adjustedReps ?? player.currentStep?.reps ?? 0) + 1
+                  )
+                }
+                style={styles.adjustButton}
+              >
+                <Plus color={Colors.secondary} size={32} />
+              </TouchableOpacity>
+            </View>
             <Text style={Typography.bodySecondary}>REPS</Text>
+
+            {player.currentStep.weight !== undefined && (
+              <View style={[styles.repControlRow, { marginTop: Spacing.md }]}>
+                <TouchableOpacity
+                  onPress={() =>
+                    player.updatePerformance(
+                      undefined,
+                      Math.max(0, (player.adjustedWeight ?? player.currentStep?.weight ?? 0) - 2.5)
+                    )
+                  }
+                  style={styles.adjustButtonSmall}
+                >
+                  <Minus color={Colors.textSecondary} size={20} />
+                </TouchableOpacity>
+                <Text style={styles.weightText}>
+                  {player.adjustedWeight ?? player.currentStep?.weight}kg
+                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    player.updatePerformance(
+                      undefined,
+                      (player.adjustedWeight ?? player.currentStep?.weight ?? 0) + 2.5
+                    )
+                  }
+                  style={styles.adjustButtonSmall}
+                >
+                  <Plus color={Colors.textSecondary} size={20} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         )}
 
@@ -321,7 +479,7 @@ export default function WorkoutPlayer() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={player.handleNext} style={styles.iconButton}>
+        <TouchableOpacity onPress={() => player.handleNext(false)} style={styles.iconButton}>
           {player.timeLeft === null ? (
             <Check color={Colors.success} size={40} />
           ) : (
@@ -496,6 +654,105 @@ const styles = StyleSheet.create({
     color: Colors.background,
     fontSize: 18,
     fontWeight: '900',
+    letterSpacing: 1,
+  },
+  prSummaryContainer: {
+    marginTop: Spacing.xl,
+    padding: Spacing.lg,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: Colors.warning + '40',
+  },
+  prHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+    justifyContent: 'center',
+  },
+  prHeaderText: {
+    ...Typography.subtitle,
+    color: Colors.warning,
+    letterSpacing: 1,
+  },
+  prRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border + '40',
+  },
+  prExerciseName: {
+    ...Typography.body,
+    fontWeight: '600',
+  },
+  prValue: {
+    ...Typography.body,
+    color: Colors.warning,
+    fontWeight: '700',
+  },
+  timerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xl,
+  },
+  adjustButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  adjustButtonSmall: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  repControlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xl,
+  },
+  weightText: {
+    ...Typography.h2,
+    fontSize: 32,
+    color: Colors.textSecondary,
+  },
+  statsSummaryGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    marginTop: Spacing.xl,
+    backgroundColor: Colors.surface,
+    padding: Spacing.lg,
+    borderRadius: 16,
+    gap: Spacing.md,
+  },
+  summaryStatItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  summaryStatValue: {
+    ...Typography.h3,
+    color: Colors.primary,
+    fontWeight: '800',
+  },
+  summaryStatLabel: {
+    ...Typography.caption,
+    fontSize: 8,
+    fontWeight: '900',
+    color: Colors.textTertiary,
+    marginTop: 4,
     letterSpacing: 1,
   },
 });
