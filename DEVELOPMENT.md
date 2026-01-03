@@ -74,7 +74,18 @@ Used for **Cloud & Infrastructure**. It sends your code to Expo's servers to bui
 YAWT uses **EAS (Expo Application Services)** for automated builds and submissions.
 
 ### 1. Versioning
-Ensure the `version` in `package.json` and `app.json` is updated. EAS will handle the `buildNumber` auto-incrementing in the cloud.
+To push a new build to TestFlight, you **must** bump the version or build number in `app.json`. Apple rejects duplicate version/build combinations.
+
+- **`version`**: The public-facing version (e.g., `1.0.0`).
+- **`ios.buildNumber`**: The internal build iteration (e.g., `"2"`). Increment this every time you upload to TestFlight for the same version.
+
+```json
+// app.json
+"version": "1.0.0",
+"ios": {
+  "buildNumber": "2"
+}
+```
 
 ### 2. Triggering a Build & Submission
 To build and automatically submit to TestFlight:

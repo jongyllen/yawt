@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yawt.app",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "deploymentTarget": "16.2",
       "usesIcloudStorage": true,
       "infoPlist": {
