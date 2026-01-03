@@ -293,6 +293,26 @@ export const getPersonalRecords = async (db: SQLite.SQLiteDatabase): Promise<Per
   return rows.map((row) => JSON.parse(row.data));
 };
 
+export const togglePersonalRecordFavorite = async (
+  db: SQLite.SQLiteDatabase,
+  prId: string,
+  isFavorite: boolean
+) => {
+  const row = await db.getFirstAsync<{ data: string }>(
+    'SELECT data FROM personal_records WHERE id = ?',
+    prId
+  );
+  if (row) {
+    const pr = JSON.parse(row.data);
+    pr.isFavorite = isFavorite;
+    await db.runAsync(
+      'UPDATE personal_records SET data = ? WHERE id = ?',
+      JSON.stringify(pr),
+      prId
+    );
+  }
+};
+
 export const getBestForExercise = async (
   db: SQLite.SQLiteDatabase,
   exerciseId: string,

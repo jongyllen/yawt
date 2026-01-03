@@ -134,6 +134,7 @@ export const PersonalRecordSchema = z.object({
   date: z.string(),
   workoutId: z.string().optional(),
   workoutName: z.string().optional(),
+  isFavorite: z.boolean().optional(),
 });
 
 export type PersonalRecord = z.infer<typeof PersonalRecordSchema>;

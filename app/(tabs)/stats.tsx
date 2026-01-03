@@ -3,10 +3,9 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
 import { Flame, Clock, Dumbbell, Calendar, TrendingUp, Zap, Trophy } from 'lucide-react-native';
-import { initDatabase, getWorkoutLogs, getPersonalRecords } from '../../src/db/database';
-import { WorkoutLog, PersonalRecord } from '../../src/schemas/schema';
+import { initDatabase, getWorkoutLogs } from '../../src/db/database';
+import { WorkoutLog } from '../../src/schemas/schema';
 import { calculateStreak } from '../../src/utils/streak';
-import { scanHistoryForPRs } from '../../src/utils/prUtils';
 
 interface StatsData {
   totalWorkouts: number;
@@ -19,7 +18,6 @@ interface StatsData {
   activityMap: Map<string, number>; // date string -> workout count
   weeklyHistory: { week: string; count: number }[];
   muscleDistribution: { name: string; count: number }[];
-  personalRecords: PersonalRecord[];
 }
 
 function getDateKey(date: Date): string {
@@ -129,7 +127,6 @@ function calculateStats(logs: WorkoutLog[]): StatsData {
     activityMap,
     weeklyHistory,
     muscleDistribution,
-    personalRecords: [], // Will be fetched separately
   };
 }
 
@@ -347,56 +344,16 @@ function ExerciseChart({ exercises }: { exercises: { name: string; count: number
   );
 }
 
-const PersonalRecordList = ({ records }: { records: PersonalRecord[] }) => {
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Trophy color={Colors.warning} size={20} />
-        <Text style={styles.sectionTitle}>PERSONAL RECORDS</Text>
-      </View>
-      {records.length === 0 ? (
-        <View style={styles.emptyPRContainer}>
-          <Text style={styles.emptyPRText}>No records yet. Finish a workout to set your first PR!</Text>
-        </View>
-      ) : (
-        <View style={styles.prList}>
-          {records.map((record) => (
-            <View key={record.id} style={styles.prItem}>
-              <View style={styles.prInfo}>
-                <Text style={styles.prExercise}>{record.exerciseName}</Text>
-                <Text style={styles.prDate}>{new Date(record.date).toLocaleDateString()}</Text>
-              </View>
-              <View style={styles.prBadge}>
-                <Text style={styles.prValueText}>
-                  {record.value}
-                  {record.type === 'weight' ? 'kg' : record.type === 'duration' ? 's' : ''}
-                </Text>
-                <Text style={styles.prTypeText}>{record.type.toUpperCase()}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
+
 
 export default function StatsScreen() {
   const [stats, setStats] = useState<StatsData | null>(null);
 
   const loadStats = useCallback(async () => {
     const db = await initDatabase();
-    let logs = await getWorkoutLogs(db);
-    let records = await getPersonalRecords(db);
-
-    // If no PRs found, attempt a one-time scan of history
-    if (records.length === 0 && logs.length > 0) {
-      await scanHistoryForPRs(db, logs);
-      records = await getPersonalRecords(db);
-    }
-
+    const logs = await getWorkoutLogs(db);
     const computed = calculateStats(logs);
-    setStats({ ...computed, personalRecords: records });
+    setStats(computed);
   }, []);
 
   useFocusEffect(
@@ -448,8 +405,7 @@ export default function StatsScreen() {
         <WeeklyChart history={stats.weeklyHistory} />
       </View>
 
-      {/* Personal Records */}
-      <PersonalRecordList records={stats.personalRecords} />
+
 
       {/* Quick Stats Grid */}
       <View style={styles.statsGrid}>

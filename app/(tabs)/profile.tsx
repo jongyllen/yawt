@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors, Typography, Spacing } from '../../src/constants/theme';
 import { initDatabase, clearAllLogs, clearAllPrograms } from '../../src/db/database';
 import { useRouter } from 'expo-router';
@@ -11,10 +11,16 @@ import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { documentDirectory, writeAsStringAsync, readAsStringAsync } from 'expo-file-system/legacy';
-import { getFullBackup, restoreFullBackup } from '../../src/db/database';
+import { getFullBackup, restoreFullBackup, getPersonalRecords, getWorkoutLogs, togglePersonalRecordFavorite } from '../../src/db/database';
 import * as Health from '../../src/utils/health';
 import * as Auth from '../../src/utils/auth';
 import * as CloudSync from '../../src/utils/cloudSync';
+import { useFocusEffect } from 'expo-router';
+import { PersonalRecord } from '../../src/schemas/schema';
+import { PersonalRecordsSection } from '../../src/components/profile/PersonalRecordsSection';
+import { scanHistoryForPRs } from '../../src/utils/prUtils';
+import { calculateStreak } from '../../src/utils/streak';
+import { Dumbbell, Flame, Trophy } from 'lucide-react-native';
 
 // Sub-components
 import { ProfileSection } from '../../src/components/settings/ProfileSection';
@@ -24,7 +30,7 @@ import { RegistrySection } from '../../src/components/settings/RegistrySection';
 import { CloudSyncSection } from '../../src/components/settings/CloudSyncSection';
 import { DangerZoneSection } from '../../src/components/settings/DangerZoneSection';
 
-export default function SettingsScreen() {
+export default function ProfileScreen() {
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
   const [healthEnabled, setHealthEnabled] = React.useState(false);
@@ -44,6 +50,45 @@ export default function SettingsScreen() {
   const [cloudUser, setCloudUser] = React.useState<Auth.CloudUser | null>(null);
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [lastSyncTime, setLastSyncTime] = React.useState<string | null>(null);
+  const [personalRecords, setPersonalRecords] = React.useState<PersonalRecord[]>([]);
+  const [activeTab, setActiveTab] = React.useState<'Settings' | 'Achievements'>('Settings');
+  const [summaryStats, setSummaryStats] = React.useState({ totalWorkouts: 0, currentStreak: 0 });
+
+  const loadPRs = React.useCallback(async () => {
+    const db = await initDatabase();
+    let records = await getPersonalRecords(db);
+
+    // If no PRs found, attempt a one-time scan of history
+    if (records.length === 0) {
+      const logs = await getWorkoutLogs(db);
+      if (logs.length > 0) {
+        await scanHistoryForPRs(db, logs);
+        records = await getPersonalRecords(db);
+      }
+    }
+
+    setPersonalRecords(records);
+
+    // Also load some summary stats
+    const logs = await getWorkoutLogs(db);
+    const streak = calculateStreak(logs);
+    setSummaryStats({
+      totalWorkouts: logs.length,
+      currentStreak: streak.current,
+    });
+  }, []);
+
+  const handleToggleFavorite = async (prId: string, isFavorite: boolean) => {
+    const db = await initDatabase();
+    await togglePersonalRecordFavorite(db, prId, isFavorite);
+    loadPRs();
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadPRs();
+    }, [loadPRs])
+  );
 
   React.useEffect(() => {
     loadSettings();
@@ -382,55 +427,105 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={Typography.h1}>Settings</Text>
+      <Text style={Typography.h1}>Profile</Text>
 
       <ProfileSection userName={userName} updateName={updateName} />
 
-      <GeneralSection
-        notificationsEnabled={notificationsEnabled}
-        toggleNotifications={toggleNotifications}
-        reminderTime={reminderTime}
-        showTimePicker={showTimePicker}
-        setShowTimePicker={setShowTimePicker}
-        onTimeChange={onTimeChange}
-        confirmTime={confirmTime}
-        healthEnabled={healthEnabled}
-        setHealthEnabled={setHealthEnabled}
-        onShowWelcome={() => router.push('/welcome')}
-      />
+      {/* Summary Highlights */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryItem}>
+          <Dumbbell size={20} color={Colors.primary} />
+          <View>
+            <Text style={styles.summaryValue}>{summaryStats.totalWorkouts}</Text>
+            <Text style={styles.summaryLabel}>Workouts</Text>
+          </View>
+        </View>
+        <View style={styles.summaryItem}>
+          <Flame size={20} color={Colors.warning} />
+          <View>
+            <Text style={styles.summaryValue}>{summaryStats.currentStreak}</Text>
+            <Text style={styles.summaryLabel}>Day Streak</Text>
+          </View>
+        </View>
+        <View style={styles.summaryItem}>
+          <Trophy size={20} color={Colors.success} />
+          <View>
+            <Text style={styles.summaryValue}>{personalRecords.length}</Text>
+            <Text style={styles.summaryLabel}>Records</Text>
+          </View>
+        </View>
+      </View>
 
-      <FeedbackSection
-        hapticsEnabled={hapticsEnabled}
-        setHapticsEnabled={setHapticsEnabled}
-        countdownBeepsEnabled={countdownBeepsEnabled}
-        setCountdownBeepsEnabled={setCountdownBeepsEnabled}
-        autoPlayEnabled={autoPlayEnabled}
-        setAutoPlayEnabled={setAutoPlayEnabled}
-      />
+      <View style={styles.segmentedControl}>
+        <TouchableOpacity
+          style={[styles.segmentButton, activeTab === 'Settings' && styles.activeSegmentButton]}
+          onPress={() => setActiveTab('Settings')}
+        >
+          <Text style={[styles.segmentText, activeTab === 'Settings' && styles.activeSegmentText]}>
+            Settings
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.segmentButton, activeTab === 'Achievements' && styles.activeSegmentButton]}
+          onPress={() => setActiveTab('Achievements')}
+        >
+          <Text style={[styles.segmentText, activeTab === 'Achievements' && styles.activeSegmentText]}>
+            Achievements
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      <RegistrySection
-        registryRepo={registryRepo}
-        updateRegistryRepo={updateRegistryRepo}
-        registryBranch={registryBranch}
-        updateRegistryBranch={updateRegistryBranch}
-      />
+      {activeTab === 'Achievements' ? (
+        <PersonalRecordsSection records={personalRecords} onToggleFavorite={handleToggleFavorite} />
+      ) : (
+        <>
+          <GeneralSection
+            notificationsEnabled={notificationsEnabled}
+            toggleNotifications={toggleNotifications}
+            reminderTime={reminderTime}
+            showTimePicker={showTimePicker}
+            setShowTimePicker={setShowTimePicker}
+            onTimeChange={onTimeChange}
+            confirmTime={confirmTime}
+            healthEnabled={healthEnabled}
+            setHealthEnabled={setHealthEnabled}
+            onShowWelcome={() => router.push('/welcome')}
+          />
 
-      <CloudSyncSection
-        cloudUser={cloudUser}
-        setCloudUser={setCloudUser}
-        isSyncing={isSyncing}
-        cloudSyncEnabled={cloudSyncEnabled}
-        setCloudSyncEnabled={setCloudSyncEnabled}
-        toggleCloudSync={toggleCloudSync}
-        lastSyncTime={lastSyncTime}
-        handleManualSync={handleManualSync}
-        handleExport={handleExport}
-        handleRestore={handleRestore}
-        handleAppleSignIn={handleAppleSignIn}
-        handleGoogleSignIn={handleGoogleSignIn}
-      />
+          <FeedbackSection
+            hapticsEnabled={hapticsEnabled}
+            setHapticsEnabled={setHapticsEnabled}
+            countdownBeepsEnabled={countdownBeepsEnabled}
+            setCountdownBeepsEnabled={setCountdownBeepsEnabled}
+            autoPlayEnabled={autoPlayEnabled}
+            setAutoPlayEnabled={setAutoPlayEnabled}
+          />
 
-      <DangerZoneSection handleResetLogs={handleResetLogs} handleResetAll={handleResetAll} />
+          <RegistrySection
+            registryRepo={registryRepo}
+            updateRegistryRepo={updateRegistryRepo}
+            registryBranch={registryBranch}
+            updateRegistryBranch={updateRegistryBranch}
+          />
+
+          <CloudSyncSection
+            cloudUser={cloudUser}
+            setCloudUser={setCloudUser}
+            isSyncing={isSyncing}
+            cloudSyncEnabled={cloudSyncEnabled}
+            setCloudSyncEnabled={setCloudSyncEnabled}
+            toggleCloudSync={toggleCloudSync}
+            lastSyncTime={lastSyncTime}
+            handleManualSync={handleManualSync}
+            handleExport={handleExport}
+            handleRestore={handleRestore}
+            handleAppleSignIn={handleAppleSignIn}
+            handleGoogleSignIn={handleGoogleSignIn}
+          />
+
+          <DangerZoneSection handleResetLogs={handleResetLogs} handleResetAll={handleResetAll} />
+        </>
+      )}
 
       <View style={{ height: Spacing.xxl }} />
     </ScrollView>
@@ -442,5 +537,62 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: Spacing.lg,
     backgroundColor: Colors.background,
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    padding: Spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginTop: Spacing.md,
+  },
+  summaryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  summaryValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.text,
+  },
+  summaryLabel: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+    textTransform: 'uppercase',
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    padding: 4,
+    borderRadius: 12,
+    marginTop: Spacing.xl,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  activeSegmentButton: {
+    backgroundColor: Colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  segmentText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textTertiary,
+  },
+  activeSegmentText: {
+    color: Colors.primary,
   },
 });
